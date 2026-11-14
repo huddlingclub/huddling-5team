@@ -321,14 +321,15 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     const outline = outlines[level];
     ctx.globalAlpha = alpha;
     if (image && outline) {
-      const { size } = DRINK_SPRITES[level];
+      // 인자 size(합체 팝 배율)와 이름이 겹치지 않게 그림 한 변은 spriteSize 로 받는다
+      const { size: spriteSize } = DRINK_SPRITES[level];
       const scale = getSpriteScale(level);
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(angle);
       ctx.scale(size, size);
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(image, -outline.centre.x * scale, -outline.centre.y * scale, size * scale, size * scale);
+      ctx.drawImage(image, -outline.centre.x * scale, -outline.centre.y * scale, spriteSize * scale, spriteSize * scale);
       ctx.restore();
       ctx.globalAlpha = 1;
       return;
