@@ -1,9 +1,20 @@
-# Vercel CLI 로컬 연결 정보 (vercel link 가 생성)
-.vercel
+# 빌드 결과물
+dist
 
-# 환경변수 · API 키 — 공개 저장소이므로 절대 커밋 금지
+# 의존성
+node_modules
+
+# 환경변수 - 공개 저장소이므로 절대 커밋 금지
 .env*
 !.env.example
 
-node_modules
+# Vercel CLI 로컬 연결 정보
+.vercel
+
+# OS
 .DS_Store
+
+# 에디터
+.vscode
+.idea
+*.swp
