@@ -88,7 +88,7 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   return (
     <main className="min-h-svh bg-background">
       <div
-        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full max-w-sm flex-col justify-end gap-4 bg-cover bg-center bg-no-repeat px-4 py-8"
+        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full max-w-sm flex-col gap-4 bg-cover bg-center bg-no-repeat p-4"
         style={{ backgroundImage: `url(${cafeBackground})` }}
       >
         {view.loser && !reduceMotion && <BeanBurst originRef={cupRef} />}
@@ -133,7 +133,7 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
           </ol>
         </section>
 
-        <Button type="button" size="lg" className="pixel-shadow h-12 w-full" onClick={onGoHome}>
+        <Button type="button" size="lg" className="pixel-shadow mt-auto h-12 w-full" onClick={onGoHome}>
           {STRINGS.RESULT_RETRY}
         </Button>
       </div>
