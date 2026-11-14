@@ -105,3 +105,22 @@ export const OBSTACLE = {
 // 방 코드 생성용 문자 (0, O, 1, I, L 제외)
 export const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_LENGTH = 6;
+
+// 자동 닉네임 생성용 단어
+const ADJECTIVES = [
+  '행복한', '용감한', '졸린', '신난', '배고픈',
+  '귀여운', '느긋한', '씩씩한', '수줍은', '엉뚱한',
+  '반짝이는', '조용한', '활발한', '따뜻한', '시원한',
+];
+const ANIMALS = [
+  '고양이', '강아지', '펭귄', '토끼', '곰',
+  '여우', '판다', '코알라', '수달', '다람쥐',
+  '부엉이', '햄스터', '오리', '알파카', '고슴도치',
+];
+
+// 랜덤 닉네임 생성 ("행복한 고양이" 스타일)
+export function generateNickname() {
+  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  return `${adj} ${animal}`;
+}

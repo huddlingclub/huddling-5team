@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -9,6 +10,7 @@
 @theme inline {
     --font-heading: 'Geist Variable', sans-serif;
     --font-sans: 'Geist Variable', sans-serif;
+    --font-pixel: 'Press Start 2P', monospace;
 
     /* shadcn 시스템 색상 → CSS 변수 연결 */
     --color-background: var(--background);
@@ -135,6 +137,15 @@
     border-width: 12px 12px 24px;
     border-image: url('/assets/ui/board-frame.png') 12 24 24 fill / 12px 24px 24px stretch;
     image-rendering: pixelated;
+}
+
+@layer components {
+  .pixel-shadow {
+    box-shadow: 3px 3px 0 0 var(--foreground);
+  }
+  .pixel-img {
+    image-rendering: pixelated;
+  }
 }
 
 @layer base {
