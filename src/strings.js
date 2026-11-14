@@ -64,7 +64,7 @@ export const STRINGS = {
   PLAY_TAP_HINT: '탭해서 음료를 떨어뜨리세요',
   // 공격 알림 문구 만들기
   PLAY_ATTACK_NOTICE: (nickname, count) => `${nickname}님이 장애물 ${count}개를 보냈어요`,
-  PLAY_EVENT_OBSTACLE: '도둑이 초콜릿을 던져요!',
+  PLAY_EVENT_OBSTACLE: '도둑이 초콜릿을 놓고 가요!',
 
   PLAY_MERGE_SCORES: '합체 점수',
   PLAY_MERGE_HELP: '합체 점수표 열기',

@@ -3,10 +3,17 @@
 // createGame({ canvas, onScore, onNext, onGameOver }) 형태로 콜백만 받는다
 
 import Matter from 'matter-js';
-import { COMBO, DRINKS, GAME, OBSTACLE, UNICORN_BONUS } from '#game/constants.js';
-import { DRINK_SPRITES, OBSTACLE_SPRITE } from '#game/sprites.js';
+import { COMBO, DELIVERY, DRINKS, GAME, OBSTACLE, UNICORN_BONUS } from '#game/constants.js';
+import { DRINK_SPRITES, OBSTACLE_SPRITE, THIEF_SPRITES } from '#game/sprites.js';
 
-const { Bodies, Composite, Engine, Events, Vertices } = Matter;
+const { Bodies, Body, Composite, Engine, Events, Vertices } = Matter;
+const RELEASE_MS = DELIVERY.ENTER_MS + DELIVERY.LOWER_MS;
+const LEAVE_MS = RELEASE_MS + DELIVERY.HOLD_MS;
+
+function easeStep(fraction) {
+  const t = Math.max(0, Math.min(1, fraction));
+  return t * t * (3 - 2 * t);
+}
 
 // 가장 높은 음료 단계 (이 단계끼리 만나면 둘 다 사라진다)
 const MAX_LEVEL = Math.max(...DRINKS.map((d) => d.level));
@@ -108,7 +115,7 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
   const themeObserver = new MutationObserver(refreshColors);
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   // 장애물(초콜릿 판) 크기
-  const obstacleWidth = getRadius(OBSTACLE.WIDTH_LEVEL) * 2;
+  const obstacleWidth = OBSTACLE.WIDTH_PX;
   const obstacleHeight = obstacleWidth * OBSTACLE.THICKNESS_RATIO;
 
   // 단계별 픽셀 그림과 충돌 외곽선 (다 불러오기 전에는 색 원으로 그리고 원으로 부딪힌다)
@@ -130,6 +137,13 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     obstacleImage = obstacleLoader;
   };
   obstacleLoader.src = OBSTACLE_SPRITE;
+  const thiefImages = {};
+  for (const [pose, url] of Object.entries(THIEF_SPRITES)) {
+    const image = new Image();
+    image.onload = () => { thiefImages[pose] = image; };
+    image.src = url;
+  }
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   // 그림 1px이 화면에서 몇 px인지 구한다 (그림의 긴 변을 음료 지름에 맞춘다)
   function getSpriteScale(level) {
@@ -146,7 +160,7 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
   let pendingObstacles = 0;
   let combo = 0;
   let lastMergeAt = 0;
-  let nextObstacleAt = 0;
+  let delivery = null;
   let score = 0;
   let maxLevel = 0;
   let elapsedMs = 0;
@@ -201,26 +215,55 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     return body;
   }
 
-  // 장애물(초콜릿 판) 하나를 컵 위쪽 무작위 가로 위치에 떨어뜨린다
-  function spawnObstacle() {
-    const half = obstacleWidth / 2;
-    const x = half + Math.random() * Math.max(0, width - obstacleWidth);
-    const body = Bodies.rectangle(x, obstacleHeight / 2 + GAME.DROP_TOP_GAP, obstacleWidth, obstacleHeight, {
+  // 손에 든 판과 손을 떠나는 충돌체 모두 같은 좌표를 사용한다.
+  function deliveryPose(age) {
+    const direction = delivery.position > 0.5 ? 1 : -1;
+    const targetX = obstacleWidth / 2 + delivery.position * Math.max(0, width - obstacleWidth);
+    const outsideX = direction > 0 ? -obstacleWidth / 2 : width + obstacleWidth / 2;
+    const enter = delivery.repeating ? 1 : easeStep(age / DELIVERY.ENTER_MS);
+    const lower = easeStep((age - DELIVERY.ENTER_MS) / DELIVERY.LOWER_MS);
+    const leave = easeStep((age - LEAVE_MS) / DELIVERY.EXIT_MS);
+    const travel = reducedMotion.matches ? 1 : enter * (1 - leave);
+    const bob = reducedMotion.matches ? 0 : DELIVERY.STEP_PX * Math.abs(Math.sin((enter + leave) * 2 * Math.PI));
+    const x = outsideX + (targetX - outsideX) * travel;
+    const carryY = Math.min(DELIVERY.CARRY_Y, Math.max(obstacleHeight / 2, height / 3));
+    const dip = lower * (1 - leave);
+    const y = carryY + DELIVERY.LOWER_PX * dip - bob;
+    return { x, y, direction, dip, leave };
+  }
+
+  function releaseChocolate({ x, y, direction }) {
+    const body = Bodies.rectangle(x, y, obstacleWidth, obstacleHeight, {
       restitution: GAME.RESTITUTION,
       friction: GAME.FRICTION,
       chamfer: { radius: OBSTACLE.CORNER_RADIUS },
       plugin: { obstacle: true, dangerSince: null },
     });
+    Body.setVelocity(body, { x: direction * DELIVERY.NUDGE_SPEED, y: 0 });
+    Body.setAngularVelocity(body, direction * DELIVERY.SPIN);
     Composite.add(engine.world, body);
     obstacles.push(body);
   }
 
-  // 받을 장애물이 남아 있으면 간격을 두고 하나씩 떨어뜨린다
+  // 한 번 들어온 도둑은 대기 중인 판을 하나씩 내려놓고 나간다.
   function dropPendingObstacles() {
-    if (pendingObstacles === 0 || elapsedMs < nextObstacleAt) return;
-    spawnObstacle();
-    pendingObstacles -= 1;
-    nextObstacleAt = elapsedMs + OBSTACLE.DROP_GAP_MS;
+    if (!delivery && pendingObstacles > 0) {
+      delivery = { startedAt: elapsedMs, position: Math.random(), released: false, repeating: false };
+    }
+    if (!delivery) return;
+    const age = elapsedMs - delivery.startedAt;
+    if (!delivery.released && age >= RELEASE_MS) {
+      releaseChocolate(deliveryPose(RELEASE_MS));
+      pendingObstacles -= 1;
+      if (pendingObstacles > 0) {
+        delivery.startedAt += OBSTACLE.DROP_GAP_MS;
+        delivery.repeating = true;
+      } else {
+        delivery.released = true;
+      }
+    } else if (age >= LEAVE_MS + DELIVERY.EXIT_MS) {
+      delivery = null;
+    }
   }
 
   // 합체가 일어난 자리 근처(가장자리에서 일정 거리 안)의 장애물을 모두 지운다
@@ -358,10 +401,10 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
   }
 
   // 장애물 하나를 납작한 초콜릿 판으로 그린다
-  function drawObstacle(body) {
+  function drawObstacle(x, y, angle) {
     ctx.save();
-    ctx.translate(body.position.x, body.position.y);
-    ctx.rotate(body.angle);
+    ctx.translate(x, y);
+    ctx.rotate(angle);
     if (obstacleImage) {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(obstacleImage, -obstacleWidth / 2, -obstacleHeight / 2, obstacleWidth, obstacleHeight);
@@ -383,6 +426,28 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     }
     ctx.stroke();
     ctx.restore();
+  }
+
+  function drawDelivery() {
+    if (!delivery) return;
+    const age = elapsedMs - delivery.startedAt;
+    const { x, y, direction, dip, leave } = deliveryPose(age);
+    const extending = age >= DELIVERY.ENTER_MS + DELIVERY.LOWER_MS / 2 && age < LEAVE_MS;
+    const image = (extending && thiefImages.throw) || thiefImages.windup;
+    if (image) {
+      const size = DELIVERY.THIEF_SIZE;
+      ctx.save();
+      ctx.translate(x - direction * DELIVERY.HAND_REACH, y);
+      ctx.scale(direction, 1);
+      if (!reducedMotion.matches) {
+        ctx.rotate(dip * 0.12 - leave * 0.08);
+        ctx.scale(1 + dip * 0.04, 1 - dip * 0.08);
+      }
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(image, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    }
+    if (!delivery.released) drawObstacle(x, y, 0);
   }
 
   // 합체로 생긴 음료를 그릴 크기 비율을 구한다 (작게 시작해 제 크기로 커진다)
@@ -422,8 +487,9 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
       }
     }
     for (const body of obstacles) {
-      drawObstacle(body);
+      drawObstacle(body.position.x, body.position.y, body.angle);
     }
+    drawDelivery();
   }
 
   // 물리를 한 걸음 진행하고 다시 그린다
@@ -480,7 +546,6 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
       const room = maxInCup - obstacles.length - pendingObstacles;
       const count = Math.max(0, Math.min(n, room));
       if (count === 0) return;
-      if (pendingObstacles === 0) nextObstacleAt = elapsedMs;
       pendingObstacles += count;
     },
     // 화면 크기가 바뀌었을 때 캔버스와 벽을 다시 맞춘다

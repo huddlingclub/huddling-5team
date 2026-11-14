@@ -31,8 +31,6 @@ export const GAME = {
   NOTICE_MS: 1500,
   // 합체 후 획득 점수를 화면에 보여주는 시간 (ms)
   SCORE_GAIN_SHOW_MS: 900,
-  // 장애물이 날아올 때 도둑이 던질 준비 자세로 서 있는 시간 (ms) - 그 뒤 던지는 자세로 바뀐다
-  THIEF_WINDUP_MS: 350,
   // 시간이 끝난 뒤 "시간종료!"를 보여주다가 리더보드로 넘어가는 시간 (ms)
   TIME_UP_SHOW_MS: 3000,
   // 합체로 막 생긴 음료가 다시 합쳐지기까지 기다리는 시간 (ms) - 생기자마자 또 합쳐져 안 보이는 것 방지
@@ -99,12 +97,27 @@ export const OBSTACLE = {
   MAX_IN_CUP: 5,
   // 여러 개가 떨어질 때 간격 (ms)
   DROP_GAP_MS: 300,
-  // 폭 기준이 되는 음료 단계 (에스프레소와 비슷한 폭)
-  WIDTH_LEVEL: 2,
+  // 그림과 충돌체가 공유하는 초콜릿 판의 폭 (px)
+  WIDTH_PX: 68,
   // 두께 = 폭 × 이 비율
   THICKNESS_RATIO: 0.5,
   // 모서리 둥글기 (px)
   CORNER_RADIUS: 4,
+};
+
+// 도둑의 등장, 손을 놓는 순간, 퇴장 동작 (ms / CSS px)
+export const DELIVERY = {
+  ENTER_MS: 440,
+  LOWER_MS: 240,
+  HOLD_MS: 140,
+  EXIT_MS: 320,
+  THIEF_SIZE: 72,
+  HAND_REACH: 46,
+  CARRY_Y: 82,
+  LOWER_PX: 12,
+  STEP_PX: 4,
+  NUDGE_SPEED: 0.75,
+  SPIN: 0.018,
 };
 
 // 방 코드 생성용 문자 (0, O, 1, I, L 제외)
