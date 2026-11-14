@@ -119,21 +119,21 @@ export default function PlayScreen({
   const isCounting = countdown !== null;
 
   return (
-    <div className="mx-auto flex h-svh w-full max-w-sm flex-col gap-3 p-4">
+    <main className="relative isolate mx-auto flex h-svh w-full max-w-sm flex-col gap-3 p-3 sm:p-4">
       {/* 화면 전체에 까는 카페 배경 */}
-      <picture>
+      <picture className="pointer-events-none fixed inset-0 -z-10">
         <source media={PLAY_BACKGROUNDS.desktop.media} srcSet={PLAY_BACKGROUNDS.desktop.url} />
         <source media={PLAY_BACKGROUNDS.mobileSmall.media} srcSet={PLAY_BACKGROUNDS.mobileSmall.url} />
         <img
           src={PLAY_BACKGROUNDS.mobile}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 -z-10 size-full object-cover object-bottom [image-rendering:pixelated]"
+          className="cafe-background pixel-img size-full object-cover object-bottom"
         />
       </picture>
 
       {/* 상단: 남은 시간 + 내 점수 + 다음 음료 */}
-      <Card size="sm">
+      <Card size="sm" className="cafe-panel">
         <CardContent className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-col">
@@ -275,6 +275,6 @@ export default function PlayScreen({
           <MergeScoreTable />
         </div>
       </div>
-    </div>
+    </main>
   );
 }

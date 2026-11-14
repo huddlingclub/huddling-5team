@@ -1,16 +1,26 @@
 // 화면에 표시되는 모든 문구를 모아둔 파일
 export const STRINGS = {
   // 홈 화면
-  HOME_TITLE: '커피내기 머지',
+  HOME_TITLE: '카페 오이시',
+  HOME_START: '시작하기',
+  HOME_BACK: '메인으로',
+  THEME_LABEL: '화면 모드',
+  THEME_LIGHT: '낮 모드',
+  THEME_DARK: '밤 모드',
+  THEME_SYSTEM: '기기 설정 따르기',
   HOME_SUBTITLE: '지면 커피 사는 머지 게임',
   NICKNAME_PLACEHOLDER: '닉네임을 입력하세요',
   CREATE_ROOM: '방 만들기',
   JOIN_ROOM: '입장',
-  ROOM_CODE_PLACEHOLDER: '코드 입력',
+  ROOM_CODE_PLACEHOLDER: '방 코드 6자리',
 
   // 방 만들기
   SETTING_PLAYERS: '인원수',
   SETTING_DURATION: '제한 시간',
+  SETTING_FEWER: '인원 줄이기',
+  SETTING_MORE: '인원 늘리기',
+  SETTING_SHORTER: '시간 줄이기',
+  SETTING_LONGER: '시간 늘리기',
   SETTING_UNIT_PLAYERS: '명',
   SETTING_UNIT_SECONDS: '초',
   SETTING_UNIT_MINUTES: '분',
@@ -22,6 +32,7 @@ export const STRINGS = {
   LOBBY_TITLE: '대기실',
   LOBBY_CODE_LABEL: '방 코드',
   LOBBY_COPY: '복사',
+  LOBBY_COPY_HINT: '방 코드를 직접 선택해 복사해 주세요.',
   LOBBY_COPIED: '복사됨!',
   LOBBY_START: '게임 시작',
   LOBBY_WAITING: '호스트가 시작할 때까지 대기 중...',

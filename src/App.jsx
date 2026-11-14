@@ -32,7 +32,7 @@ export default function App() {
   const [sentAttack, setSentAttack] = useState(null);
   // 시간이 끝난 뒤 "시간종료!"를 지나 리더보드를 열었는지
   const [isResultOpen, setIsResultOpen] = useState(false);
-  // 방 설정 모달에서 고른 값 ({ maxPlayers, durationSec }). 가짜 방은 인원수·시간을 받지 않아 대기실 자리 수 표시에만 쓴다
+  // 방 설정에서 고른 대기실 자리 수
   const [roomSettings, setRoomSettings] = useState(null);
 
   const isPlaying = room.status === 'playing';
@@ -84,7 +84,7 @@ export default function App() {
       <HomeScreen
         onCreateRoom={(settings) => {
           setRoomSettings(settings);
-          room.createRoom(generateNickname());
+          room.createRoom(generateNickname(), settings);
         }}
         onJoinRoom={(code) => {
           setRoomSettings(null);
