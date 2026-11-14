@@ -81,13 +81,15 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }) {
                 <img src="/assets/home/cafe-oishi-logo.png" alt={STRINGS.HOME_TITLE} width={920} height={250} className="h-auto w-full [image-rendering:pixelated]" />
               </h1>
               <Button
+                type="button"
                 variant="ghost"
                 aria-label={STRINGS.HOME_START}
                 onClick={() => setStarted(true)}
-                className="home-start group h-auto rounded-none border-0 p-0 hover:bg-transparent"
+                className="home-start group relative h-auto min-h-11 touch-manipulation rounded-none border-0 p-0 transition-none hover:bg-transparent active:not-aria-[haspopup]:translate-y-0"
               >
-                <img src="/assets/home/start-default.png" alt="" width={546} height={216} className="h-auto w-full [image-rendering:pixelated] group-hover:hidden group-focus-visible:hidden group-active:hidden" />
-                <img src="/assets/home/start-active.png" alt="" width={546} height={216} className="hidden h-auto w-full [image-rendering:pixelated] group-hover:block group-focus-visible:block group-active:block" />
+                {/* 기본 그림이 항상 자리를 유지하게 해 터치 중 클릭 대상이 사라지지 않도록 한다. */}
+                <img src="/assets/home/start-default.png" alt="" width={546} height={216} draggable={false} className="pointer-events-none block h-auto w-full select-none [image-rendering:pixelated]" />
+                <img src="/assets/home/start-active.png" alt="" width={546} height={216} draggable={false} className="pointer-events-none absolute inset-0 size-full object-contain opacity-0 select-none [image-rendering:pixelated] group-focus-visible:opacity-100 group-active:opacity-100 pointer-fine:group-hover:opacity-100" />
               </Button>
             </div>
           </>
