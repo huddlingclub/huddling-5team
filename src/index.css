@@ -1,0 +1,143 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── 커피 테마 디자인 토큰 ── */
+@theme inline {
+    --font-heading: 'Geist Variable', sans-serif;
+    --font-sans: 'Geist Variable', sans-serif;
+
+    /* shadcn 시스템 색상 → CSS 변수 연결 */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    /* 커피 음료 단계별 색상 (게임 전용) */
+    --color-bean: var(--bean);
+    --color-espresso: var(--espresso);
+    --color-americano: var(--americano);
+    --color-latte: var(--latte);
+    --color-frappe: var(--frappe);
+    --color-unicorn: var(--unicorn);
+
+    /* 차트 (점수판용) */
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    /* 라운딩 */
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ── 라이트 모드 ── */
+:root {
+    /* 커피 테마 기본 색상 */
+    --background: oklch(0.98 0.005 70);
+    --foreground: oklch(0.2 0.04 50);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2 0.04 50);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2 0.04 50);
+    --primary: oklch(0.45 0.1 55);
+    --primary-foreground: oklch(0.98 0.005 70);
+    --secondary: oklch(0.93 0.02 70);
+    --secondary-foreground: oklch(0.3 0.06 50);
+    --muted: oklch(0.95 0.01 70);
+    --muted-foreground: oklch(0.5 0.03 50);
+    --accent: oklch(0.93 0.02 70);
+    --accent-foreground: oklch(0.3 0.06 50);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.9 0.015 70);
+    --input: oklch(0.9 0.015 70);
+    --ring: oklch(0.45 0.1 55);
+    --radius: 0.75rem;
+
+    /* 음료 단계별 색상 */
+    --bean: oklch(0.45 0.12 55);
+    --espresso: oklch(0.35 0.1 40);
+    --americano: oklch(0.55 0.08 60);
+    --latte: oklch(0.75 0.06 75);
+    --frappe: oklch(0.65 0.1 160);
+    --unicorn: oklch(0.7 0.2 330);
+
+    /* 점수판 차트 색상 */
+    --chart-1: oklch(0.45 0.1 55);
+    --chart-2: oklch(0.55 0.08 60);
+    --chart-3: oklch(0.65 0.1 160);
+    --chart-4: oklch(0.7 0.2 330);
+    --chart-5: oklch(0.75 0.06 75);
+}
+
+/* ── 다크 모드 ── */
+.dark {
+    --background: oklch(0.18 0.02 50);
+    --foreground: oklch(0.93 0.01 70);
+    --card: oklch(0.22 0.025 50);
+    --card-foreground: oklch(0.93 0.01 70);
+    --popover: oklch(0.22 0.025 50);
+    --popover-foreground: oklch(0.93 0.01 70);
+    --primary: oklch(0.7 0.1 60);
+    --primary-foreground: oklch(0.18 0.02 50);
+    --secondary: oklch(0.28 0.03 50);
+    --secondary-foreground: oklch(0.9 0.01 70);
+    --muted: oklch(0.28 0.03 50);
+    --muted-foreground: oklch(0.65 0.03 60);
+    --accent: oklch(0.28 0.03 50);
+    --accent-foreground: oklch(0.9 0.01 70);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.7 0.1 60);
+
+    --bean: oklch(0.55 0.12 55);
+    --espresso: oklch(0.45 0.1 40);
+    --americano: oklch(0.65 0.08 60);
+    --latte: oklch(0.8 0.06 75);
+    --frappe: oklch(0.7 0.1 160);
+    --unicorn: oklch(0.75 0.2 330);
+
+    --chart-1: oklch(0.55 0.12 55);
+    --chart-2: oklch(0.65 0.08 60);
+    --chart-3: oklch(0.7 0.1 160);
+    --chart-4: oklch(0.75 0.2 330);
+    --chart-5: oklch(0.8 0.06 75);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+  }
+  html {
+    @apply font-sans;
+  }
+}
