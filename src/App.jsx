@@ -3,7 +3,7 @@ import HomeScreen from '#screens/HomeScreen.jsx';
 import LobbyScreen from '#screens/LobbyScreen.jsx';
 import PlayScreen from '#screens/PlayScreen.jsx';
 import ResultPage, { isResultPath } from '#pages/ResultPage.jsx';
-import { GAME } from '#game/constants.js';
+import { GAME, generateNickname } from '#game/constants.js';
 import { getAttackCount } from '#game/engine.js';
 import { useLocalRoom } from '#dev/useLocalRoom.js';
 
@@ -32,6 +32,8 @@ export default function App() {
   const [sentAttack, setSentAttack] = useState(null);
   // 시간이 끝난 뒤 "시간종료!"를 지나 리더보드를 열었는지
   const [isResultOpen, setIsResultOpen] = useState(false);
+  // 방 설정 모달에서 고른 값 ({ maxPlayers, durationSec }). 가짜 방은 인원수·시간을 받지 않아 대기실 자리 수 표시에만 쓴다
+  const [roomSettings, setRoomSettings] = useState(null);
 
   const isPlaying = room.status === 'playing';
   const isFinished = room.status === 'finished';
@@ -75,16 +77,33 @@ export default function App() {
     );
   }
 
+  // 새 홈은 닉네임 입력 없이 방 설정({ maxPlayers, durationSec })이나 코드만 넘긴다.
+  // 가짜 방은 닉네임을 받으므로 여기서 자동 닉네임을 만들어 맞춰 준다
   if (room.status === 'idle') {
-    return <HomeScreen onCreateRoom={room.createRoom} onJoinRoom={room.joinRoom} />;
+    return (
+      <HomeScreen
+        onCreateRoom={(settings) => {
+          setRoomSettings(settings);
+          room.createRoom(generateNickname());
+        }}
+        onJoinRoom={(code) => {
+          setRoomSettings(null);
+          room.joinRoom(generateNickname(), code);
+        }}
+      />
+    );
   }
 
+  // 새 대기실은 player.id 와 myId 가 같은 참가자에게 "나"를 붙인다. 가짜 방 참가자는 id 가 없어 닉네임을 id 로 쓴다.
+  // 자리는 설정한 인원수만큼 보여주되, 이미 들어온 참가자는 가리지 않는다
   if (room.status === 'lobby') {
     return (
       <LobbyScreen
         roomCode={room.roomCode}
-        players={room.players}
+        players={room.players.map((p) => ({ ...p, id: p.nickname }))}
+        myId={room.myNickname}
         isHost={room.isHost}
+        maxPlayers={Math.max(roomSettings?.maxPlayers ?? 0, room.players.length)}
         onStart={() => {
           setCombo(0);
           setSentAttack(null);
