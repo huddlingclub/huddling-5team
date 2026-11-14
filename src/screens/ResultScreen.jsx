@@ -6,14 +6,8 @@ import americano from '../../docs/design-assets/drinks/americano.png';
 // 결과 화면: 꼴찌(커피 당번)를 먼저 보여주고, 그 아래 전체 순위를 둔다.
 export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   const view = toResultView(result);
-  const dateLabel = STRINGS.RESULT_DATE(view.month, view.day, view.participantCount);
-
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 bg-background px-4 py-4">
-      <header>
-        <p className="text-center text-sm text-muted-foreground">{dateLabel}</p>
-      </header>
-
       {view.loser && (
         <section className="bg-espresso px-1 pt-1 pb-2">
           <div className="bg-latte px-1 pb-1">
