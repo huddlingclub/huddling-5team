@@ -101,6 +101,7 @@ export default function PlayScreen({
   notice = null,
   combo = 0,
   sentAttack = null,
+  sidebarFooter = null,
   onScore,
   onNextLevel,
   onComboChange,
@@ -116,7 +117,7 @@ export default function PlayScreen({
   const isCounting = countdown !== null;
 
   return (
-    <div className="mx-auto flex h-svh w-full max-w-sm flex-col gap-3 p-4">
+    <div className="mx-auto flex h-svh w-full max-w-sm flex-col gap-3 p-4 md:h-180 md:max-h-svh">
       {/* 화면 전체에 까는 카페 배경 */}
       <picture>
         <source media={PLAY_BACKGROUNDS.desktop.media} srcSet={PLAY_BACKGROUNDS.desktop.url} />
@@ -235,24 +236,27 @@ export default function PlayScreen({
           )}
         </div>
         {/* 점수판 + 합체 점수표 (컵 오른쪽) */}
-        <div className="flex min-h-0 w-28 shrink-0 flex-col gap-3 overflow-y-auto p-px">
-          <Card size="sm">
-            <CardContent className="flex flex-col gap-3">
-              <span className="text-xs text-muted-foreground">{STRINGS.PLAY_SCOREBOARD}</span>
-              {players.map((p, i) => (
-                <ScoreBar
-                  key={i}
-                  nickname={p.nickname}
-                  score={p.score ?? 0}
-                  maxScore={maxScore}
-                  isMe={p.nickname === myNickname}
-                  isLoser={hasGap && (p.score ?? 0) === minScore}
-                  isOut={p.alive === false}
-                />
-              ))}
-            </CardContent>
-          </Card>
-          <MergeScoreTable />
+        <div className="flex min-h-0 w-28 shrink-0 flex-col gap-3 p-px">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto *:shrink-0">
+            <Card size="sm">
+              <CardContent className="flex flex-col gap-3">
+                <span className="text-xs text-muted-foreground">{STRINGS.PLAY_SCOREBOARD}</span>
+                {players.map((p, i) => (
+                  <ScoreBar
+                    key={i}
+                    nickname={p.nickname}
+                    score={p.score ?? 0}
+                    maxScore={maxScore}
+                    isMe={p.nickname === myNickname}
+                    isLoser={hasGap && (p.score ?? 0) === minScore}
+                    isOut={p.alive === false}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+            <MergeScoreTable />
+          </div>
+          {sidebarFooter}
         </div>
       </div>
     </div>
