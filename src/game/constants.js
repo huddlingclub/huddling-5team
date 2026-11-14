@@ -28,6 +28,8 @@ export const ROOM = {
 export const GAME = {
   // 경고선 초과 허용 시간 (ms)
   DANGER_TIMEOUT_MS: 2000,
+  // 경고선 높이 (컵 위쪽에서 px)
+  DANGER_LINE_Y: 48,
   // 점수 전송 주기 제한 (ms)
   SCORE_THROTTLE_MS: 1000,
   // 컵 안 음료 최대 개수
@@ -50,6 +52,32 @@ export const GAME = {
   LABEL_MIN_LEVEL: 3,
   // 음료 이름 글자 크기 (px)
   LABEL_FONT_PX: 12,
+};
+
+// 콤보와 공격
+export const COMBO = {
+  // 콤보가 이어지는 시간 (ms)
+  WINDOW_MS: 1500,
+  // 공격이 발동하는 최소 콤보
+  ATTACK_MIN_COMBO: 2,
+  // 한 번에 보내는 최대 장애물 수
+  MAX_OBSTACLES_PER_ATTACK: 3,
+};
+
+// 방해 요소 (장애물)
+export const OBSTACLE = {
+  // 이 거리(px) 안에서 합체가 일어나면 장애물 삭제
+  CLEAR_RADIUS_PX: 40,
+  // 한 컵에 쌓일 수 있는 장애물 수
+  MAX_IN_CUP: 5,
+  // 여러 개가 떨어질 때 간격 (ms)
+  DROP_GAP_MS: 300,
+  // 폭 기준이 되는 음료 단계 (에스프레소와 비슷한 폭)
+  WIDTH_LEVEL: 2,
+  // 두께 = 폭 × 이 비율
+  THICKNESS_RATIO: 0.5,
+  // 모서리 둥글기 (px)
+  CORNER_RADIUS: 4,
 };
 
 // 방 코드 생성용 문자 (0, O, 1, I, L 제외)

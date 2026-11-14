@@ -2,14 +2,22 @@ import { useEffect, useRef } from 'react';
 import { createGame } from '#game/engine.js';
 
 // engine.js를 화면의 canvas에 붙이는 컴포넌트
-export default function GameCanvas({ active = true, onScore, onNext, onGameOver }) {
+export default function GameCanvas({
+  active = true,
+  attack = null,
+  onScore,
+  onNext,
+  onComboChange,
+  onCombo,
+  onGameOver,
+}) {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   // 엔진을 다시 만들지 않고도 최신 콜백을 부르기 위한 보관함
-  const callbacksRef = useRef({ onScore, onNext, onGameOver });
+  const callbacksRef = useRef({ onScore, onNext, onComboChange, onCombo, onGameOver });
 
   useEffect(() => {
-    callbacksRef.current = { onScore, onNext, onGameOver };
+    callbacksRef.current = { onScore, onNext, onComboChange, onCombo, onGameOver };
   });
 
   // 엔진을 만들고 시작한다. 화면에서 사라질 때 정리한다
@@ -19,6 +27,8 @@ export default function GameCanvas({ active = true, onScore, onNext, onGameOver 
       canvas,
       onScore: (...args) => callbacksRef.current.onScore?.(...args),
       onNext: (...args) => callbacksRef.current.onNext?.(...args),
+      onComboChange: (...args) => callbacksRef.current.onComboChange?.(...args),
+      onCombo: (...args) => callbacksRef.current.onCombo?.(...args),
       onGameOver: (...args) => callbacksRef.current.onGameOver?.(...args),
     });
     gameRef.current = game;
@@ -33,6 +43,11 @@ export default function GameCanvas({ active = true, onScore, onNext, onGameOver 
       gameRef.current = null;
     };
   }, []);
+
+  // 새 공격({ count })을 받으면 그 수만큼 장애물을 떨어뜨린다
+  useEffect(() => {
+    if (attack) gameRef.current?.addObstacles(attack.count);
+  }, [attack]);
 
   // 포인터의 화면 좌표를 캔버스 안 가로 위치로 바꾼다
   function toCanvasX(event) {

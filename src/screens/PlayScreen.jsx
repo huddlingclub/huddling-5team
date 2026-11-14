@@ -4,7 +4,7 @@ import { Card, CardContent } from '#components/ui/card.jsx';
 import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
-import { DRINKS, ROOM } from '#game/constants.js';
+import { COMBO, DRINKS, GAME, ROOM } from '#game/constants.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
 
@@ -62,8 +62,12 @@ export default function PlayScreen({
   countdown = null,
   nextLevel = 1,
   notice = null,
+  combo = 0,
+  sentAttack = null,
   onScore,
   onNextLevel,
+  onComboChange,
+  onCombo,
   onGameOver,
 }) {
   const scores = players.map((p) => p.score ?? 0);
@@ -111,7 +115,10 @@ export default function PlayScreen({
         {/* 컵(게임판) */}
         <div className="relative h-full min-w-0 flex-1 overflow-hidden rounded-b-3xl border-x-4 border-b-4 border-primary bg-card">
           {/* 경고선 */}
-          <div className="pointer-events-none absolute inset-x-0 top-12 z-10 flex items-center gap-2 px-2">
+          <div
+            className="pointer-events-none absolute inset-x-0 z-10 flex -translate-y-1/2 items-center gap-2 px-2"
+            style={{ top: GAME.DANGER_LINE_Y }}
+          >
             <div className="flex-1 border-t-2 border-dashed border-destructive/60" />
             <span className="text-xs text-destructive">{STRINGS.PLAY_DANGER_LINE}</span>
           </div>
@@ -128,8 +135,11 @@ export default function PlayScreen({
           {!isGameOver && (
             <GameCanvas
               active={!isCounting}
+              attack={notice}
               onScore={onScore}
               onNext={onNextLevel}
+              onComboChange={onComboChange}
+              onCombo={onCombo}
               onGameOver={onGameOver}
             />
           )}
@@ -138,6 +148,21 @@ export default function PlayScreen({
             <p className="pointer-events-none absolute inset-x-0 top-20 px-2 text-center text-sm text-muted-foreground">
               {STRINGS.PLAY_TAP_HINT}
             </p>
+          )}
+
+          {/* 콤보 진행 상황, 콤보가 끊겨 공격을 보냈을 때 안내 */}
+          {!isGameOver && (sentAttack || combo >= COMBO.ATTACK_MIN_COMBO) && (
+            <div className="pointer-events-none absolute inset-x-0 top-16 z-20 flex justify-center px-2">
+              {sentAttack ? (
+                <Badge key="sent" className="h-7 animate-in px-3 text-sm zoom-in-75 fade-in">
+                  {STRINGS.PLAY_ATTACK_SENT(sentAttack.count)}
+                </Badge>
+              ) : (
+                <Badge key={combo} variant="secondary" className="h-7 animate-in px-3 text-sm font-bold zoom-in-75">
+                  {STRINGS.PLAY_COMBO(combo)}
+                </Badge>
+              )}
+            </div>
           )}
 
           {/* 3-2-1 카운트다운 */}

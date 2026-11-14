@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '#components/ui/button.jsx';
 import PlayScreen from '#screens/PlayScreen.jsx';
 import { ROOM } from '#game/constants.js';
+import { getAttackCount } from '#game/engine.js';
 import { STRINGS } from '#strings.js';
 
 // 테스트용 가짜 값 (실제 게임 숫자가 아님)
@@ -10,7 +11,6 @@ const OTHER_NICKNAMES = ['지민', '하늘', '도윤', '서연'];
 const COUNTDOWN_FROM = 3;
 const TICK_MS = 1000;
 const NOTICE_MS = 1500;
-const MY_SCORE_STEP = 5;
 const OTHER_SCORE_MAX_STEP = 8;
 const ATTACK_COUNTS = [1, 2, 3];
 
@@ -33,6 +33,8 @@ export default function PlayPreview() {
   const [nextLevel, setNextLevel] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
   const [notice, setNotice] = useState(null);
+  const [combo, setCombo] = useState(0);
+  const [sentAttack, setSentAttack] = useState(null);
   // 다시 시작할 때 게임판을 새로 만들기 위한 판 번호
   const [round, setRound] = useState(0);
 
@@ -67,10 +69,12 @@ export default function PlayPreview() {
     return () => clearTimeout(id);
   }, [notice]);
 
-  // 내 점수를 올린다
-  function handleAddScore() {
-    setMyScore((s) => s + MY_SCORE_STEP);
-  }
+  // 보낸 공격 안내를 잠깐 보여주고 지운다
+  useEffect(() => {
+    if (!sentAttack) return undefined;
+    const id = setTimeout(() => setSentAttack(null), NOTICE_MS);
+    return () => clearTimeout(id);
+  }, [sentAttack]);
 
   // 상대가 장애물을 보낸 것처럼 알림을 띄운다
   function handleAttack() {
@@ -86,6 +90,8 @@ export default function PlayPreview() {
     setNextLevel(1);
     setIsGameOver(false);
     setNotice(null);
+    setCombo(0);
+    setSentAttack(null);
     setRound((r) => r + 1);
   }
 
@@ -107,15 +113,16 @@ export default function PlayPreview() {
         notice={notice}
         onScore={setMyScore}
         onNextLevel={setNextLevel}
+        combo={combo}
+        sentAttack={sentAttack}
+        onComboChange={setCombo}
+        onCombo={(count) => setSentAttack({ count: getAttackCount(count) })}
         onGameOver={() => setIsGameOver(true)}
       />
 
       {/* 테스트 조작 버튼 (점수판 아래 빈자리) */}
       <div className="absolute right-4 bottom-4 flex w-28 flex-col gap-2">
         <span className="text-xs text-muted-foreground">{STRINGS.DEV_TITLE}</span>
-        <Button size="sm" disabled={!canPlay} onClick={handleAddScore}>
-          {STRINGS.DEV_ADD_SCORE}
-        </Button>
         <Button size="sm" variant="outline" disabled={!canPlay} onClick={handleAttack}>
           {STRINGS.DEV_ATTACK}
         </Button>
