@@ -23,3 +23,9 @@ export const PLAY_BACKGROUNDS = {
 
 // 장애물(초콜릿 판) 픽셀 그림. 가로:세로 = 2:1
 export const OBSTACLE_SPRITE = '/assets/obstacles/chocolate.png';
+
+// 장애물이 날아올 때 잠깐 나오는 도둑 픽셀 그림 (준비 자세 → 던지는 자세, 둘 다 오른쪽을 본다)
+export const THIEF_SPRITES = {
+  windup: '/assets/effects/thief-windup.svg',
+  throw: '/assets/effects/thief-throw.svg',
+};

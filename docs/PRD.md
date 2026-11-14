@@ -38,8 +38,8 @@ Nov 14, 2026 · @Yullie
 | 2 | 에스프레소 | 등장 (확률 30%) | +2 | 1.4 |
 | 3 | 아이스 아메리카노 | 등장 (확률 20%) | +5 | 1.9 |
 | 4 | 라떼 | 미등장 | +12 | 2.5 |
-| 5 | 커피 프라푸치노 | 미등장 | +30 | 3.2 |
-| 6 | 유니콘 프라푸치노 | 미등장 | +80 | 4.0 |
+| 5 | 커피 프라페 | 미등장 | +30 | 3.2 |
+| 6 | 유니콘 프라페 | 미등장 | +80 | 4.0 |
 
 점수는 "그 단계 음료가 만들어질 때" 더한다. 등장 확률·점수·크기는 초기값이며 플레이 테스트로 조정한다. 유니콘 두 잔이 만나면 둘 다 사라지고 +200점 보너스를 준다(최종 단계 처리).
 
@@ -137,6 +137,7 @@ React + Tailwind CSS를 Vite로 만들고, GitHub에 올리면 Vercel이 빌드�
 | AI 코딩 도구 | 자유 (Claude Code, Cursor, GitHub Copilot 등) | 작업 시작 시 도구에게 `AGENTS.md`를 먼저 읽게 하기 |
 | 프레임워크 | React (함수형 컴포넌트 + Hooks), JavaScript(JSX) | 없음 |
 | 스타일 | Tailwind CSS v4 (Vite 플러그인), 커피 테마 디자인 토큰 | 토큰에 없는 색·크기 쓰지 않기 |
+| UI 컴포넌트 | shadcn/ui (`src/components/ui/`). 그 밖의 UI 라이브러리는 쓰지 않음 | 새 컴포넌트가 필요하면 먼저 알리기 |
 | 빌드 도구 | Vite | AI 도구에 "npm install 하고 개발 서버 켜줘"라고 요청 |
 | 실행 환경 | Node.js LTS (`.nvmrc`로 버전 고정), 패키지 관리는 npm만 | 사전 준비 때 Node.js 설치 |
 | 게임 물리 | matter.js (npm 패키지) | 없음 |
@@ -174,9 +175,9 @@ React + Tailwind CSS를 Vite로 만들고, GitHub에 올리면 Vercel이 빌드�
 | Node·패키지 | Node.js LTS를 `.nvmrc`로 고정, npm만 사용, `package-lock.json` 커밋. 새 패키지 추가는 팀 합의 후 대표가 |
 | 스타일링 | Tailwind CSS 클래스만 사용. 별도 CSS 파일과 인라인 `style` 금지 (Canvas 그리기 코드는 예외) |
 | 디자인 토큰 | 색·글꼴·둥글기는 `src/index.css`의 `@theme`에 정의한 커피 테마 토큰만 사용 (예: `bg-espresso`, `text-latte`). `bg-[#6F4E37]` 같은 임의 값 금지 |
-| 공용 컴포넌트 | 버튼·카드·점수 바·모달은 `src/components/`의 것만 사용하고, 화면에서 새로 만들지 않음 |
+| 공용 컴포넌트 | 버튼·카드·모달·다이얼로그·점수 바는 `src/components/ui/`(shadcn/ui)와 `src/components/`의 것만 사용하고, 화면에서 새로 만들지 않음 |
 | 이름 짓기 | 컴포넌트와 그 파일은 PascalCase (`HomeScreen.jsx`), 훅은 `use`로 시작, 변수·함수 camelCase, 상수 UPPER\_SNAKE\_CASE |
-| 형식 | Prettier 기본값 + prettier-plugin-tailwindcss(클래스 순서 자동 정렬), ESLint React 기본 규칙. 커밋 전 `npm run format` |
+| 형식 | 들여쓰기 스페이스 2칸, 세미콜론 사용, 작은따옴표. 린트 도구는 `oxlint`(`npm run lint`) |
 | 주석 | 한국어. 컴포넌트·함수마다 "무엇을 하는지" 한 줄 |
 | 화면 문구 | 모두 `src/strings.js`에 모음 |
 | 게임 숫자 | 음료 단계·점수·크기·확률·시간·콤보 값은 모두 `src/game/constants.js`에만 |
@@ -191,7 +192,7 @@ React + Tailwind CSS를 Vite로 만들고, GitHub에 올리면 Vercel이 빌드�
 | `src/index.css` | Tailwind 불러오기 + `@theme` 커피 테마 토큰 | 화면 |
 | `src/main.jsx`, `src/App.jsx` | 앱 시작, 화면 전환 상태, 게임·방 모듈 연결 | 실시간 |
 | `src/screens/` | `HomeScreen`, `LobbyScreen`, `PlayScreen`, `ResultScreen` | 화면 |
-| `src/components/` | 공용 UI: `Button`, `Card`, `ScoreBar`, `Modal` | 화면 |
+| `src/components/` | 공용 UI: shadcn/ui(`ui/`), `ScoreBar`, `Modal` | 화면 |
 | `src/strings.js` | 화면 문구 | 화면 |
 | `src/game/constants.js` | 음료 6단계, 점수, 방 설정 범위, 콤보 값 | 게임 (바꿀 때 공유) |
 | `src/game/engine.js` | matter.js 물리·낙하·머지·점수·콤보·게임오버 (React를 모름) | 게임 |
@@ -209,24 +210,25 @@ React + Tailwind CSS를 Vite로 만들고, GitHub에 올리면 Vercel이 빌드�
 1. `main` 브랜치는 항상 빌드되는 상태로 두고, 직접 올리지 않는다
 2. 작업 시작 전 "main 최신으로 받고 npm install 해줘"라고 AI 도구에 요청한다
 3. 작업마다 브랜치를 만든다. 이름은 `이름/기능` (예: `jimin/score-board`)
-4. 올리기 전에 `npm run build`와 `npm run format`을 통과시킨다
+4. 올리기 전에 `npm run build`를 통과시킨다
 5. 올리면 Vercel이 그 브랜치의 미리보기 주소를 만든다. 거기서 PC·폰으로 확인한다
 6. Pull Request를 열고, 다른 1명이 미리보기 주소로 확인한 뒤 `main`에 합친다
 7. 남의 담당 파일이나 `package.json`을 고쳐야 하면 먼저 담당자에게 말한다
 
-**`AGENTS.md` 시작본** (대표가 0:00에 저장소에 올림)
+**`AGENTS.md`** (원본은 저장소의 파일이다. 아래는 2026-11-14 `main` 기준 사본이며, 어긋나면 저장소 파일을 따른다)
 
 ```markdown
 # 커피내기 머지 게임 - 팀 규칙
-- 스택: React(함수형 + Hooks, JavaScript/JSX) + Tailwind CSS v4 + Vite. TypeScript, 다른 UI 라이브러리 금지
+
+- 스택: React(함수형 + Hooks, JavaScript/JSX) + Tailwind CSS v4 + shadcn/ui + Vite. TypeScript, 다른 UI 라이브러리 금지
 - 패키지: npm만 사용. 새 패키지 설치 금지 (필요하면 먼저 알려준다)
 - 스타일: Tailwind 클래스만. 색·글꼴·둥글기는 src/index.css의 @theme 토큰만 쓰고 임의 값(bg-[#...]) 금지
-- 버튼·카드·점수 바·모달은 src/components/ 것을 재사용한다
+- 버튼·카드·모달·다이얼로그는 src/components/ui/ (shadcn/ui)와 src/components/ 것을 재사용한다
 - 화면 문구는 src/strings.js, 게임 숫자는 src/game/constants.js에만 둔다
 - 메시지 이름·필드는 src/room/protocol.js를 따른다. 임의로 추가·변경 금지
 - engine.js는 React를 import하지 않는다. screens/는 Supabase를 직접 부르지 않는다
 - 요청받은 담당 파일만 수정한다. 다른 파일 수정이 필요하면 먼저 알려준다
-- 커밋 전 npm run build와 npm run format을 통과시킨다. main에 직접 커밋하지 않는다
+- 커밋 전 npm run build를 통과시킨다. main에 직접 커밋하지 않는다
 - secret 키를 넣지 않는다. 환경 변수는 VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY만
 ```
 
