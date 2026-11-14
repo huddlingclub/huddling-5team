@@ -26,6 +26,12 @@ export const ROOM = {
 
 // 게임 물리 관련
 export const GAME = {
+  // 시작 전 카운트다운 (초)
+  COUNTDOWN_SEC: 3,
+  // 카운트다운이 끝난 뒤 GO를 보여주는 시간 (ms)
+  GO_SHOW_MS: 700,
+  // 공격 알림을 띄우는 시간 (ms)
+  NOTICE_MS: 1500,
   // 경고선 초과 허용 시간 (ms)
   DANGER_TIMEOUT_MS: 2000,
   // 경고선 높이 (컵 위쪽에서 px)

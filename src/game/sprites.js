@@ -20,3 +20,6 @@ export const PLAY_BACKGROUNDS = {
   // 태블릿·PC
   desktop: { url: '/assets/backgrounds/cafe-desktop.png', media: '(min-width: 768px)' },
 };
+
+// 장애물(초콜릿 판) 픽셀 그림. 가로:세로 = 2:1
+export const OBSTACLE_SPRITE = '/assets/obstacles/chocolate.png';

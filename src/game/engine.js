@@ -4,7 +4,7 @@
 
 import Matter from 'matter-js';
 import { COMBO, DRINKS, GAME, OBSTACLE, UNICORN_BONUS } from '#game/constants.js';
-import { DRINK_SPRITES } from '#game/sprites.js';
+import { DRINK_SPRITES, OBSTACLE_SPRITE } from '#game/sprites.js';
 
 const { Bodies, Composite, Engine, Events, Vertices } = Matter;
 
@@ -113,6 +113,14 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     };
     image.src = sprite.url;
   }
+
+  // 장애물 그림 (다 불러오기 전에는 색 사각형으로 그린다)
+  let obstacleImage = null;
+  const obstacleLoader = new Image();
+  obstacleLoader.onload = () => {
+    obstacleImage = obstacleLoader;
+  };
+  obstacleLoader.src = OBSTACLE_SPRITE;
 
   // 그림 1px이 화면에서 몇 px인지 구한다 (그림의 긴 변을 음료 지름에 맞춘다)
   function getSpriteScale(level) {
@@ -336,6 +344,12 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     ctx.save();
     ctx.translate(body.position.x, body.position.y);
     ctx.rotate(body.angle);
+    if (obstacleImage) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(obstacleImage, -obstacleWidth / 2, -obstacleHeight / 2, obstacleWidth, obstacleHeight);
+      ctx.restore();
+      return;
+    }
     ctx.fillStyle = obstacleColor;
     ctx.beginPath();
     ctx.roundRect(-obstacleWidth / 2, -obstacleHeight / 2, obstacleWidth, obstacleHeight, OBSTACLE.CORNER_RADIUS);
