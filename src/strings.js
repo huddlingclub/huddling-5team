@@ -1,7 +1,18 @@
 // 화면에 표시되는 모든 문구를 모아둔 파일
 export const STRINGS = {
+  // 화면 모드
+  THEME_LABEL: '화면 모드',
+  THEME_LIGHT: '라이트',
+  THEME_DARK: '다크',
+  THEME_SYSTEM: '자동',
+  THEME_SYSTEM_HINT: '자동은 기기의 화면 설정을 따라요',
+
   // 홈 화면
-  HOME_TITLE: '커피내기 머지',
+  HOME_TITLE: '카페 오이시',
+  HOME_START: '시작하기',
+  HOME_BACK: '메인으로',
+  HOME_NICKNAME: '닉네임',
+  HOME_ROOM_CODE: '방 코드',
   HOME_SUBTITLE: '지면 커피 사는 머지 게임',
   NICKNAME_PLACEHOLDER: '닉네임을 입력하세요',
   CREATE_ROOM: '방 만들기',

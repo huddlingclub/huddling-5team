@@ -94,10 +94,19 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
   const styles = getComputedStyle(canvas);
   // 색은 index.css의 토큰(CSS 변수)에서 읽어온다
   const token = (name) => styles.getPropertyValue(`--${name}`).trim();
-  const colors = Object.fromEntries(DRINKS.map((d) => [d.color, token(d.color)]));
-  const textColor = token('background');
-  const guideColor = token('border');
-  const obstacleColor = token('foreground');
+  let colors;
+  let textColor;
+  let guideColor;
+  let obstacleColor;
+  function refreshColors() {
+    colors = Object.fromEntries(DRINKS.map((d) => [d.color, token(d.color)]));
+    textColor = token('background');
+    guideColor = token('border');
+    obstacleColor = token('foreground');
+  }
+  refreshColors();
+  const themeObserver = new MutationObserver(refreshColors);
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   // 장애물(초콜릿 판) 크기
   const obstacleWidth = getRadius(OBSTACLE.WIDTH_LEVEL) * 2;
   const obstacleHeight = obstacleWidth * OBSTACLE.THICKNESS_RATIO;
@@ -448,6 +457,7 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     resize,
     // 게임 정리
     destroy() {
+      themeObserver.disconnect();
       if (frameId !== null) cancelAnimationFrame(frameId);
       frameId = null;
       drinks = [];
