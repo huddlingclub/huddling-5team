@@ -38,6 +38,7 @@ export const STRINGS = {
   // 결과
   RESULT_TITLE: '결과',
   RESULT_COFFEE_DUTY: '오늘의 커피 당번',
+  RESULT_AMERICANO: '아이스 아메리카노',
   RESULT_PLAY_AGAIN: '한 판 더',
   RESULT_GO_HOME: '홈으로',
   RESULT_RETRY: '다시하기',

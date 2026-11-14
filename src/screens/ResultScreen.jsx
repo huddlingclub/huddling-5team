@@ -1,6 +1,7 @@
 import { Button } from '#components/ui/button.jsx';
 import { STRINGS } from '#strings.js';
 import { MOCK_RESULT, formatScore, toResultView } from '#screens/resultModel.js';
+import americano from '../../docs/design-assets/drinks/americano.png';
 
 // 결과 화면: 꼴찌(커피 당번)를 먼저 보여주고, 그 아래 전체 순위를 둔다.
 export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
@@ -14,10 +15,16 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
       </header>
 
       {view.loser && (
-        <section className="flex flex-col items-center rounded-3xl bg-card px-6 py-8 text-center">
-          <div className="size-36 rounded-full bg-foreground/10" aria-hidden="true" />
-          <p className="mt-6 text-sm text-foreground">{STRINGS.RESULT_COFFEE_DUTY}</p>
-          <p className="mt-2 text-5xl font-bold tracking-tight text-foreground">{view.loser.name}</p>
+        <section className="flex flex-col items-center rounded-3xl bg-card p-6 text-center">
+          <img
+            src={americano}
+            alt={STRINGS.RESULT_AMERICANO}
+            width={100}
+            height={100}
+            className="size-25 [image-rendering:pixelated]"
+          />
+          <p className="mt-4 text-sm text-foreground">{STRINGS.RESULT_COFFEE_DUTY}</p>
+          <p className="mt-2 text-[32px] font-bold leading-none tracking-tight text-foreground">{view.loser.name}</p>
         </section>
       )}
 
@@ -29,7 +36,7 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
               key={row.name}
               className={
                 row.isLoser
-                  ? 'mt-1 flex items-center gap-3 rounded-lg bg-destructive/15 px-3 py-2.5 text-destructive'
+                  ? 'mt-1 flex items-center gap-3 rounded-lg bg-foreground/10 px-3 py-2.5 text-foreground'
                   : 'flex items-center gap-3 border-b border-border px-3 py-2.5 text-foreground'
               }
             >
