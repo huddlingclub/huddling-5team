@@ -19,13 +19,11 @@ export const STRINGS = {
   SETTING_DURATION: '제한 시간',
   SETTING_FEWER: '인원 줄이기',
   SETTING_MORE: '인원 늘리기',
-  SETTING_SHORTER: '시간 줄이기',
-  SETTING_LONGER: '시간 늘리기',
+  SETTING_FIXED_DURATION: (minutes) => `${minutes}분 고정`,
+  SETTING_EVENT_OBSTACLE: (seconds) => `${seconds}초마다 모든 참가자의 게임판에 초콜릿이 한 개씩 떨어져요.`,
   SETTING_UNIT_PLAYERS: '명',
-  SETTING_UNIT_SECONDS: '초',
-  SETTING_UNIT_MINUTES: '분',
   SETTING_MODAL_TITLE: '방 설정',
-  SETTING_MODAL_DESCRIPTION: '게임 인원과 시간을 정해주세요',
+  SETTING_MODAL_DESCRIPTION: '쿠폰 이벤트에 참여할 인원수를 정해주세요.',
   SETTING_CONFIRM: '만들기',
 
   // 대기실
@@ -66,6 +64,7 @@ export const STRINGS = {
   PLAY_TAP_HINT: '탭해서 음료를 떨어뜨리세요',
   // 공격 알림 문구 만들기
   PLAY_ATTACK_NOTICE: (nickname, count) => `${nickname}님이 장애물 ${count}개를 보냈어요`,
+  PLAY_EVENT_OBSTACLE: '도둑이 초콜릿을 던져요!',
 
   PLAY_MERGE_SCORES: '합체 점수',
   PLAY_MERGE_HELP: '합체 점수표 열기',
@@ -86,6 +85,8 @@ export const STRINGS = {
 
   // 결과
   RESULT_TITLE: '결과',
+  RESULT_MY_RECORD: '내 쿠폰 이벤트 기록',
+  RESULT_MY_NICKNAME: '내 닉네임',
   RESULT_COFFEE_DUTY: '오늘의 커피 당번',
   RESULT_AMERICANO: '아이스 아메리카노',
   RESULT_PLAY_AGAIN: '한 판 더',

@@ -7,7 +7,7 @@ import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import Modal from '#components/Modal.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
-import { COMBO, DRINKS, GAME, ROOM, UNICORN_BONUS } from '#game/constants.js';
+import { COMBO, DRINKS, GAME, OBSTACLE, ROOM, UNICORN_BONUS } from '#game/constants.js';
 import { DRINK_SPRITES, PLAY_BACKGROUNDS, THIEF_SPRITES } from '#game/sprites.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
@@ -124,7 +124,7 @@ function CupOverlay({ children }) {
 export default function PlayScreen({
   players,
   timeLeft,
-  durationSec = ROOM.DEFAULT_DURATION_SEC,
+  durationSec = ROOM.DURATION_SEC,
   myNickname,
   myScore,
   isGameOver,
@@ -132,6 +132,7 @@ export default function PlayScreen({
   countdown = null,
   nextLevel = 1,
   notice = null,
+  eventRound = false,
   combo = 0,
   sentAttack = null,
   sidebarFooter = null,
@@ -166,6 +167,13 @@ export default function PlayScreen({
   const showMyCoffeeRisk = hasGap && myScore === minScore && !isGameOver && !isTimeUp;
   const isLowTime = timeLeft <= LOW_TIME_SEC;
   const isCounting = countdown !== null;
+  const elapsedSec = durationSec - timeLeft;
+  const scheduledDrops = eventRound
+    ? Math.min(OBSTACLE.EVENT_DROP_COUNT, Math.floor(elapsedSec / OBSTACLE.EVENT_DROP_INTERVAL_SEC))
+    : 0;
+  const lastDropSec = scheduledDrops * OBSTACLE.EVENT_DROP_INTERVAL_SEC;
+  const showEventDrop = scheduledDrops > 0 && (elapsedSec - lastDropSec) * 1000 < GAME.NOTICE_MS;
+  const showObstacle = !isGameOver && !isTimeUp && (showEventDrop || notice);
 
   return (
     <main className="relative isolate mx-auto flex h-svh w-full min-w-0 flex-col gap-2 p-2 md:h-180 md:max-h-svh md:max-w-sm md:gap-3 md:p-4">
@@ -275,21 +283,22 @@ export default function PlayScreen({
           </div>
 
           {/* 공격 알림 */}
-          {notice && (
+          {showObstacle && (
             <div className="pointer-events-none absolute inset-x-0 top-2 z-20 flex justify-center px-2">
               <Badge variant="destructive" className="h-7 animate-in max-w-full bg-card px-2 fade-in slide-in-from-top-2">
-                {STRINGS.PLAY_ATTACK_NOTICE(notice.nickname, notice.count)}
+                {showEventDrop ? STRINGS.PLAY_EVENT_OBSTACLE : STRINGS.PLAY_ATTACK_NOTICE(notice.nickname, notice.count)}
               </Badge>
             </div>
           )}
 
           {/* 장애물을 던지는 도둑 */}
-          {notice && !isGameOver && !isTimeUp && <ThiefThrow />}
+          {showObstacle && <ThiefThrow />}
 
           {!isGameOver && (
             <GameCanvas
               active={!isCounting && !isTimeUp}
               attack={notice}
+              scheduledDrops={scheduledDrops}
               onScore={onScore}
               onNext={onNextLevel}
               onComboChange={onComboChange}

@@ -475,9 +475,9 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
       return true;
     },
     // 장애물 n개를 받는다. 컵 상한을 넘치는 만큼은 버린다
-    addObstacles(n) {
+    addObstacles(n, maxInCup = OBSTACLE.MAX_IN_CUP) {
       if (isOver) return;
-      const room = OBSTACLE.MAX_IN_CUP - obstacles.length - pendingObstacles;
+      const room = maxInCup - obstacles.length - pendingObstacles;
       const count = Math.max(0, Math.min(n, room));
       if (count === 0) return;
       if (pendingObstacles === 0) nextObstacleAt = elapsedMs;

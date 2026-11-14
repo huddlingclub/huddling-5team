@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { createGame } from '#game/engine.js';
+import { OBSTACLE } from '#game/constants.js';
 
 // engine.js를 화면의 canvas에 붙이는 컴포넌트
 export default function GameCanvas({
   active = true,
   attack = null,
+  scheduledDrops = 0,
   onScore,
   onNext,
   onComboChange,
@@ -13,6 +15,7 @@ export default function GameCanvas({
 }) {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
+  const deliveredDrops = useRef(0);
   // 엔진을 다시 만들지 않고도 최신 콜백을 부르기 위한 보관함
   const callbacksRef = useRef({ onScore, onNext, onComboChange, onCombo, onGameOver });
 
@@ -32,6 +35,7 @@ export default function GameCanvas({
       onGameOver: (...args) => callbacksRef.current.onGameOver?.(...args),
     });
     gameRef.current = game;
+    deliveredDrops.current = 0;
     game.start();
 
     const observer = new ResizeObserver(() => game.resize());
@@ -48,6 +52,15 @@ export default function GameCanvas({
   useEffect(() => {
     if (attack) gameRef.current?.addObstacles(attack.count);
   }, [attack]);
+
+  // 탭을 다시 열어 여러 시점을 건너뛴 경우에도 같은 회차를 두 번 투하하지 않는다.
+  useEffect(() => {
+    const due = scheduledDrops - deliveredDrops.current;
+    if (active && due > 0) {
+      gameRef.current.addObstacles(due, OBSTACLE.EVENT_DROP_COUNT);
+      deliveredDrops.current = scheduledDrops;
+    }
+  }, [active, scheduledDrops]);
 
   // 포인터의 화면 좌표를 캔버스 안 가로 위치로 바꾼다
   function toCanvasX(event) {

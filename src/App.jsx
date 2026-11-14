@@ -4,8 +4,7 @@ import LobbyScreen from '#screens/LobbyScreen.jsx';
 import PlayScreen from '#screens/PlayScreen.jsx';
 import ResultPage, { isResultPath } from '#pages/ResultPage.jsx';
 import { GAME, generateNickname } from '#game/constants.js';
-import { getAttackCount } from '#game/engine.js';
-import { useLocalRoom } from '#dev/useLocalRoom.js';
+import { localRoomNow, useLocalRoom } from '#dev/useLocalRoom.js';
 
 const RESULT_STORAGE_KEY = 'encantado-result';
 
@@ -26,10 +25,9 @@ function readStoredResult() {
 export default function App() {
   // TODO: useRoom.js가 완성되면 useLocalRoom 대신 useRoom을 쓴다 (돌려주는 값의 모양을 맞춰 둠)
   const room = useLocalRoom();
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(localRoomNow);
   const [nextLevel, setNextLevel] = useState(1);
   const [combo, setCombo] = useState(0);
-  const [sentAttack, setSentAttack] = useState(null);
   // 시간이 끝난 뒤 "시간종료!"를 지나 리더보드를 열었는지
   const [isResultOpen, setIsResultOpen] = useState(false);
   // 방 설정에서 고른 대기실 자리 수
@@ -41,16 +39,9 @@ export default function App() {
   // 게임 중에는 시계를 돌려 카운트다운과 남은 시간을 갱신한다
   useEffect(() => {
     if (!isPlaying) return undefined;
-    const id = setInterval(() => setNow(Date.now()), CLOCK_TICK_MS);
+    const id = setInterval(() => setNow(localRoomNow()), CLOCK_TICK_MS);
     return () => clearInterval(id);
   }, [isPlaying]);
-
-  // 보낸 공격 안내를 잠깐 보여주고 지운다
-  useEffect(() => {
-    if (!sentAttack) return undefined;
-    const id = setTimeout(() => setSentAttack(null), GAME.NOTICE_MS);
-    return () => clearTimeout(id);
-  }, [sentAttack]);
 
   // 결과가 나오면 /result 주소에서도 다시 볼 수 있게 저장해 둔다
   useEffect(() => {
@@ -106,9 +97,8 @@ export default function App() {
         maxPlayers={Math.max(roomSettings?.maxPlayers ?? 0, room.players.length)}
         onStart={() => {
           setCombo(0);
-          setSentAttack(null);
           setIsResultOpen(false);
-          setNow(Date.now());
+          setNow(localRoomNow());
           room.startGame();
         }}
       />
@@ -138,11 +128,10 @@ export default function App() {
         countdown={countdown}
         nextLevel={nextLevel}
         combo={combo}
-        sentAttack={sentAttack}
+        eventRound
         onScore={room.sendScore}
         onNextLevel={setNextLevel}
         onComboChange={setCombo}
-        onCombo={(count) => setSentAttack({ count: getAttackCount(count) })}
         onGameOver={isFinished ? undefined : room.sendGameOver}
         onShowResult={() => setIsResultOpen(true)}
       />
