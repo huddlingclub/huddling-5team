@@ -46,13 +46,16 @@ export const STRINGS = {
   // 공격 알림 문구 만들기
   PLAY_ATTACK_NOTICE: (nickname, count) => `${nickname}님이 장애물 ${count}개를 보냈어요`,
 
+  PLAY_MERGE_SCORES: '합체 점수',
+  PLAY_NO_SCORE: '—',
+  // 합체 점수 문구 만들기
+  PLAY_SCORE_PLUS: (score) => `+${score}`,
   // 콤보 표시 문구 만들기
   PLAY_COMBO: (count) => `${count}콤보!`,
   // 공격을 보냈을 때 문구 만들기
   PLAY_ATTACK_SENT: (count) => `장애물 ${count}개 보냄!`,
 
   // 플레이 화면 테스트 페이지 (?test=play)
-  DEV_TITLE: '테스트 조작',
   DEV_ATTACK: '공격 받기',
   DEV_GAME_OVER: '게임오버',
   DEV_RESTART: '다시 시작',

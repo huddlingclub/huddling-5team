@@ -4,7 +4,7 @@ import { Card, CardContent } from '#components/ui/card.jsx';
 import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
-import { COMBO, DRINKS, GAME, ROOM } from '#game/constants.js';
+import { COMBO, DRINKS, GAME, ROOM, UNICORN_BONUS } from '#game/constants.js';
 import { DRINK_SPRITES } from '#game/sprites.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
@@ -34,6 +34,48 @@ function NextDrink({ level }) {
         className="size-10 shrink-0 [image-rendering:pixelated]"
       />
     </div>
+  );
+}
+
+// 음료 그림 아이콘 하나
+function DrinkIcon({ drink, className }) {
+  return (
+    <img
+      src={DRINK_SPRITES[drink.level].url}
+      alt={drink.name}
+      title={drink.name}
+      className={cn('size-6 shrink-0 [image-rendering:pixelated]', className)}
+    />
+  );
+}
+
+// 음료가 만들어질 때 얻는 점수 표 (마지막 줄은 최종 단계끼리 만났을 때 보너스)
+function MergeScoreTable() {
+  const lastDrink = DRINKS[DRINKS.length - 1];
+
+  return (
+    <Card size="sm">
+      <CardContent className="flex flex-col gap-1.5">
+        <span className="text-xs text-muted-foreground">{STRINGS.PLAY_MERGE_SCORES}</span>
+        {DRINKS.map((drink) => (
+          <div key={drink.level} className="flex items-center justify-between gap-2">
+            <DrinkIcon drink={drink} />
+            <span className="font-mono text-sm font-semibold tabular-nums">
+              {drink.mergeScore > 0 ? STRINGS.PLAY_SCORE_PLUS(drink.mergeScore) : STRINGS.PLAY_NO_SCORE}
+            </span>
+          </div>
+        ))}
+        <div className="flex items-center justify-between gap-2 border-t pt-1.5">
+          <div className="flex">
+            <DrinkIcon drink={lastDrink} />
+            <DrinkIcon drink={lastDrink} className="-ml-2" />
+          </div>
+          <span className="font-mono text-sm font-semibold tabular-nums">
+            {STRINGS.PLAY_SCORE_PLUS(UNICORN_BONUS)}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -180,23 +222,26 @@ export default function PlayScreen({
             </CupOverlay>
           )}
         </div>
-        {/* 점수판 (컵 오른쪽) */}
-        <Card size="sm" className="w-28 shrink-0 self-start">
-          <CardContent className="flex flex-col gap-3">
-            <span className="text-xs text-muted-foreground">{STRINGS.PLAY_SCOREBOARD}</span>
-            {players.map((p, i) => (
-              <ScoreBar
-                key={i}
-                nickname={p.nickname}
-                score={p.score ?? 0}
-                maxScore={maxScore}
-                isMe={p.nickname === myNickname}
-                isLoser={hasGap && (p.score ?? 0) === minScore}
-                isOut={p.alive === false}
-              />
-            ))}
-          </CardContent>
-        </Card>
+        {/* 점수판 + 합체 점수표 (컵 오른쪽) */}
+        <div className="flex min-h-0 w-28 shrink-0 flex-col gap-3 overflow-y-auto p-px">
+          <Card size="sm">
+            <CardContent className="flex flex-col gap-3">
+              <span className="text-xs text-muted-foreground">{STRINGS.PLAY_SCOREBOARD}</span>
+              {players.map((p, i) => (
+                <ScoreBar
+                  key={i}
+                  nickname={p.nickname}
+                  score={p.score ?? 0}
+                  maxScore={maxScore}
+                  isMe={p.nickname === myNickname}
+                  isLoser={hasGap && (p.score ?? 0) === minScore}
+                  isOut={p.alive === false}
+                />
+              ))}
+            </CardContent>
+          </Card>
+          <MergeScoreTable />
+        </div>
       </div>
     </div>
   );

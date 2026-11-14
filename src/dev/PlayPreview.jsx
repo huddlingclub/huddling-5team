@@ -121,15 +121,14 @@ export default function PlayPreview() {
       />
 
       {/* 테스트 조작 버튼 (점수판 아래 빈자리) */}
-      <div className="absolute right-4 bottom-4 flex w-28 flex-col gap-2">
-        <span className="text-xs text-muted-foreground">{STRINGS.DEV_TITLE}</span>
-        <Button size="sm" variant="outline" disabled={!canPlay} onClick={handleAttack}>
+      <div className="absolute right-4 bottom-4 flex w-28 flex-col gap-1">
+        <Button size="xs" variant="outline" disabled={!canPlay} onClick={handleAttack}>
           {STRINGS.DEV_ATTACK}
         </Button>
-        <Button size="sm" variant="destructive" disabled={!canPlay} onClick={() => setIsGameOver(true)}>
+        <Button size="xs" variant="destructive" disabled={!canPlay} onClick={() => setIsGameOver(true)}>
           {STRINGS.DEV_GAME_OVER}
         </Button>
-        <Button size="sm" variant="secondary" onClick={handleRestart}>
+        <Button size="xs" variant="secondary" onClick={handleRestart}>
           {STRINGS.DEV_RESTART}
         </Button>
       </div>
