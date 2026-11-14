@@ -27,7 +27,7 @@ export default function RoomSettingsModal({ open, onClose, onConfirm }) {
       titleClassName="text-lg font-bold"
       description={STRINGS.SETTING_MODAL_DESCRIPTION}
       descriptionClassName="text-base"
-      contentClassName="p-7"
+      contentClassName="cafe-panel max-h-[90svh] overflow-y-auto bg-card p-6"
     >
       <div className="flex flex-col gap-5 py-5">
         {/* 인원수 스테퍼 */}
@@ -37,6 +37,8 @@ export default function RoomSettingsModal({ open, onClose, onConfirm }) {
             <Button
               variant="outline"
               size="icon"
+              aria-label={STRINGS.SETTING_FEWER}
+              className="size-11"
               disabled={maxPlayers <= ROOM.MIN_PLAYERS}
               onClick={() => setMaxPlayers((v) => v - 1)}
             >
@@ -48,6 +50,8 @@ export default function RoomSettingsModal({ open, onClose, onConfirm }) {
             <Button
               variant="outline"
               size="icon"
+              aria-label={STRINGS.SETTING_MORE}
+              className="size-11"
               disabled={maxPlayers >= ROOM.MAX_PLAYERS}
               onClick={() => setMaxPlayers((v) => v + 1)}
             >
@@ -63,6 +67,8 @@ export default function RoomSettingsModal({ open, onClose, onConfirm }) {
             <Button
               variant="outline"
               size="icon"
+              aria-label={STRINGS.SETTING_SHORTER}
+              className="size-11"
               disabled={durationSec <= ROOM.MIN_DURATION_SEC}
               onClick={() => setDurationSec((v) => v - ROOM.DURATION_STEP_SEC)}
             >
@@ -74,6 +80,8 @@ export default function RoomSettingsModal({ open, onClose, onConfirm }) {
             <Button
               variant="outline"
               size="icon"
+              aria-label={STRINGS.SETTING_LONGER}
+              className="size-11"
               disabled={durationSec >= ROOM.MAX_DURATION_SEC}
               onClick={() => setDurationSec((v) => v + ROOM.DURATION_STEP_SEC)}
             >

@@ -35,16 +35,19 @@ export function useLocalRoom() {
   const [roomCode, setRoomCode] = useState('');
   const [myNickname, setMyNickname] = useState('');
   const [players, setPlayers] = useState([]);
-  const [durationSec] = useState(ROOM.DEFAULT_DURATION_SEC);
+  const [durationSec, setDurationSec] = useState(ROOM.DEFAULT_DURATION_SEC);
   const [startsAt, setStartsAt] = useState(null);
   const [endsAt, setEndsAt] = useState(null);
   const [result, setResult] = useState(null);
 
   // 나와 봇들로 대기실을 채운다
-  function enterLobby(nickname, code) {
+  function enterLobby(nickname, code, settings = {}) {
+    const capacity = settings.maxPlayers ?? ROOM.DEFAULT_PLAYERS;
+    const bots = BOT_NICKNAMES.slice(0, capacity - 1);
+    setDurationSec(settings.durationSec ?? ROOM.DEFAULT_DURATION_SEC);
     setMyNickname(nickname);
     setRoomCode(code);
-    setPlayers([createPlayer(nickname, false), ...BOT_NICKNAMES.map((name) => createPlayer(name, true))]);
+    setPlayers([createPlayer(nickname, false), ...bots.map((name) => createPlayer(name, true))]);
     setResult(null);
     setStatus('lobby');
   }
@@ -87,7 +90,7 @@ export function useLocalRoom() {
     endsAt,
     result,
     // 방 만들기
-    createRoom: (nickname) => enterLobby(nickname, createCode()),
+    createRoom: (nickname, settings) => enterLobby(nickname, createCode(), settings),
     // 코드로 입장 (가짜 방이라 어떤 코드든 들어간다)
     joinRoom: (nickname, code) => enterLobby(nickname, code),
     // 게임 시작: 카운트다운 뒤 시작하도록 시각을 정한다

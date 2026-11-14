@@ -13,18 +13,25 @@ export default function LobbyScreen({ roomCode, players, isHost, maxPlayers, myI
   const slotCount = maxPlayers || players.length;
   const canStart = isHost && players.length >= 2;
   const [copied, setCopied] = useState(false);
+  const [copyHint, setCopyHint] = useState(false);
 
-  function handleCopy() {
-    navigator.clipboard.writeText(roomCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(roomCode);
+      setCopyHint(false);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopyHint(true);
+    }
   }
 
-  function handleShare() {
-    if (navigator.share) {
-      navigator.share({ title: STRINGS.HOME_TITLE, text: `${STRINGS.LOBBY_CODE_LABEL}: ${roomCode}` });
-    } else {
-      handleCopy();
+  async function handleShare() {
+    if (!navigator.share) return handleCopy();
+    try {
+      await navigator.share({ title: STRINGS.HOME_TITLE, text: `${STRINGS.LOBBY_CODE_LABEL}: ${roomCode}` });
+    } catch (error) {
+      if (error.name !== 'AbortError') setCopyHint(true);
     }
   }
 
@@ -39,90 +46,90 @@ export default function LobbyScreen({ roomCode, players, isHost, maxPlayers, myI
   }
 
   return (
-    <div className="flex items-center justify-center min-h-svh bg-background">
-    <div
-      className="flex flex-col items-center w-full max-w-sm min-h-svh gap-6 p-6 pt-16 bg-cover bg-top bg-no-repeat pixel-img"
-      style={{ backgroundImage: "url('/assets/lobby-bg.png')" }}
-    >
-      <h2 className="font-pixel text-lg leading-relaxed">{STRINGS.LOBBY_TITLE}</h2>
-
-      {/* 방 코드 */}
-      <Card className="w-full max-w-xs">
-        <CardContent className="flex flex-col items-center gap-3 pt-6">
-          <span className="text-sm text-muted-foreground">{STRINGS.LOBBY_CODE_LABEL}</span>
-          <span className="font-pixel text-2xl tracking-widest">{roomCode}</span>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleCopy}>
-              <Copy />
-              {copied ? STRINGS.LOBBY_COPIED : STRINGS.LOBBY_COPY}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleShare}>
-              <Share2 />
-              {STRINGS.LOBBY_SHARE}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 참가자 슬롯 */}
-      <div className="flex flex-col gap-2 w-full max-w-xs">
-        {Array.from({ length: slotCount }, (_, i) => {
-          const player = players[i];
-          if (player) {
-            return (
-              <div
-                key={i}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3"
-              >
-                <img
-                  src={DRINK_ICONS[i % DRINK_ICONS.length]}
-                  alt=""
-                  className="pixel-img w-8 h-8"
-                />
-                <span className="flex-1">
-                  {player.nickname}
-                  {i === 0 && (
-                    <span className="ml-2 text-xs text-muted-foreground">(호스트)</span>
-                  )}
-                </span>
-                {player.id === myId && (
-                  <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">나</span>
-                )}
-              </div>
-            );
-          }
-          return (
-            <div
-              key={i}
-              className="flex items-center justify-center rounded-lg border border-dashed border-border px-4 py-3 text-muted-foreground animate-pulse"
-            >
-              {STRINGS.LOBBY_EMPTY_SLOT}
+    <main className="min-h-svh bg-background">
+      <div
+        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full max-w-sm flex-col items-center justify-end gap-4 bg-cover bg-center px-4 py-8"
+        style={{ backgroundImage: "url('/assets/lobby-bg.png')" }}
+      >
+        <Card className="cafe-panel w-full max-w-xs">
+          <CardContent className="flex flex-col items-center gap-4">
+            <h1 className="self-start text-xl font-bold">{STRINGS.LOBBY_TITLE}</h1>
+            <div className="flex w-full flex-col items-center rounded-lg bg-secondary p-3 text-secondary-foreground">
+              <span className="text-xs">{STRINGS.LOBBY_CODE_LABEL}</span>
+              <strong className="font-pixel text-3xl tracking-widest select-all">{roomCode}</strong>
             </div>
-          );
-        })}
-      </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="h-11 px-4" onClick={handleCopy}>
+                <Copy />
+                {copied ? STRINGS.LOBBY_COPIED : STRINGS.LOBBY_COPY}
+              </Button>
+              <Button variant="outline" className="h-11 px-4" onClick={handleShare}>
+                <Share2 />
+                {STRINGS.LOBBY_SHARE}
+              </Button>
+            </div>
+            {copyHint && <p role="status" className="text-sm text-muted-foreground">{STRINGS.LOBBY_COPY_HINT}</p>}
+            {/* 참가자 슬롯 */}
+            <div className="flex flex-col gap-2 w-full max-w-xs">
+              {Array.from({ length: slotCount }, (_, i) => {
+                const player = players[i];
+                if (player) {
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3"
+                    >
+                      <img
+                        src={DRINK_ICONS[i % DRINK_ICONS.length]}
+                        alt=""
+                        className="pixel-img w-8 h-8"
+                      />
+                      <span className="flex-1">
+                        {player.nickname}
+                        {i === 0 && (
+                          <span className="ml-2 text-xs text-muted-foreground">(호스트)</span>
+                        )}
+                      </span>
+                      {player.id === myId && (
+                        <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">나</span>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center justify-center rounded-lg border border-dashed border-border px-4 py-3 text-sm text-muted-foreground"
+                  >
+                    {STRINGS.LOBBY_EMPTY_SLOT}
+                  </div>
+                );
+              })}
+            </div>
 
-      {/* 상태 메시지 */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        {players.length >= 2 && players.length < slotCount && (
-          <Loader2 className="size-4 animate-spin" />
-        )}
-        <span>{statusMessage}</span>
-      </div>
+            {/* 상태 메시지 */}
+            <div role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
+              {players.length >= 2 && players.length < slotCount && (
+                <Loader2 className="size-4 animate-spin" />
+              )}
+              <span>{statusMessage}</span>
+            </div>
 
-      {/* 시작 버튼 (호스트만) */}
-      {isHost ? (
-        <Button
-          className="w-full max-w-xs pixel-shadow h-13 text-base"
-          disabled={!canStart}
-          onClick={onStart}
-        >
-          {STRINGS.LOBBY_START}
-        </Button>
-      ) : (
-        <p className="text-muted-foreground">{STRINGS.LOBBY_WAITING}</p>
-      )}
-    </div>
-    </div>
+            {/* 시작 버튼 (호스트만) */}
+            {isHost ? (
+              <Button
+                className="w-full max-w-xs pixel-shadow h-13 text-base"
+                disabled={!canStart}
+                onClick={onStart}
+              >
+                {STRINGS.LOBBY_START}
+              </Button>
+            ) : (
+              <p className="text-muted-foreground">{STRINGS.LOBBY_WAITING}</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
