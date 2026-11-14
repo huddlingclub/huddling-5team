@@ -1,6 +1,5 @@
 import { Badge } from '#components/ui/badge.jsx';
 import { Button } from '#components/ui/button.jsx';
-import { Card, CardContent } from '#components/ui/card.jsx';
 import { DRINKS } from '#game/constants.js';
 import { DRINK_SPRITES } from '#game/sprites.js';
 import { STRINGS } from '#strings.js';
@@ -21,21 +20,16 @@ export default function ResultScreen({ rankings = [], coffeeLoser, myNickname, o
   const dutyDrink = DRINKS.find((drink) => drink.level === DUTY_DRINK_LEVEL);
   const sprite = DRINK_SPRITES[DUTY_DRINK_LEVEL];
   const loserRow = rankings.find((row) => row.nickname === coffeeLoser);
-  const today = new Date();
 
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 bg-background px-4 py-6">
-      <header>
-        <h1 className="sr-only">{STRINGS.RESULT_TITLE}</h1>
-        <p className="text-center text-sm text-muted-foreground">
-          {STRINGS.RESULT_DATE(today.getMonth() + 1, today.getDate(), rankings.length)}
-        </p>
-      </header>
+      <h1 className="sr-only">{STRINGS.RESULT_TITLE}</h1>
 
       {coffeeLoser && (
-        <section aria-labelledby="coffee-duty-label">
-          <Card>
-            <CardContent className="flex flex-col items-center gap-2 text-center">
+        // 픽셀 액자 프레임: 진한 커피색, 라떼색, 흰 면을 겹쳐 도트 테두리처럼 보이게 한다
+        <section aria-labelledby="coffee-duty-label" className="bg-espresso px-1 pt-1 pb-2">
+          <div className="bg-latte px-1 pb-1">
+            <div className="flex flex-col items-center gap-2 bg-card p-6 text-center">
               <img
                 src={sprite.url}
                 alt={dutyDrink.name}
@@ -59,8 +53,8 @@ export default function ResultScreen({ rankings = [], coffeeLoser, myNickname, o
                   {STRINGS.RESULT_SCORE_UNIT}
                 </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
       )}
 

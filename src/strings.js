@@ -67,8 +67,6 @@ export const STRINGS = {
   RESULT_RANKING: '전체 순위',
   RESULT_ME: '나',
   RESULT_SCORE_UNIT: '점',
-  // 날짜와 참여 인원 문구 만들기
-  RESULT_DATE: (month, day, count) => `${month}월 ${day}일 · ${count}명 참여`,
   RESULT_PLAY_AGAIN: '한 판 더',
   RESULT_GO_HOME: '홈으로',
 
