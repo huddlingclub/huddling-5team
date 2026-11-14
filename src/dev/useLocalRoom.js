@@ -10,16 +10,22 @@ const BOT_TICK_MS = 1000;
 const BOT_SCORE_MAX_STEP = 8;
 const BOT_MAX_LEVEL = 3;
 
+// 기기 시계를 바꿔도 쿠폰 이벤트의 경과 시간은 그대로 흐른다.
+export function localRoomNow() {
+  return performance.timeOrigin + performance.now();
+}
+
 // 무작위 방 코드를 만든다
 function createCode() {
   return Array.from({ length: CODE_LENGTH }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
 }
 
 // 결과 화면(ResultScreen)이 받는 모양으로 최종 결과를 만든다
-function createResult(players) {
+function createResult(players, myNickname) {
   const today = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   return {
+    myNickname,
     date: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
     players: players.map((p) => ({ name: p.nickname, score: p.score, finished: true })),
   };
@@ -35,7 +41,6 @@ export function useLocalRoom() {
   const [roomCode, setRoomCode] = useState('');
   const [myNickname, setMyNickname] = useState('');
   const [players, setPlayers] = useState([]);
-  const [durationSec, setDurationSec] = useState(ROOM.DEFAULT_DURATION_SEC);
   const [startsAt, setStartsAt] = useState(null);
   const [endsAt, setEndsAt] = useState(null);
   const [result, setResult] = useState(null);
@@ -44,7 +49,6 @@ export function useLocalRoom() {
   function enterLobby(nickname, code, settings = {}) {
     const capacity = settings.maxPlayers ?? ROOM.DEFAULT_PLAYERS;
     const bots = BOT_NICKNAMES.slice(0, capacity - 1);
-    setDurationSec(settings.durationSec ?? ROOM.DEFAULT_DURATION_SEC);
     setMyNickname(nickname);
     setRoomCode(code);
     setPlayers([createPlayer(nickname, false), ...bots.map((name) => createPlayer(name, true))]);
@@ -54,30 +58,31 @@ export function useLocalRoom() {
 
   // 내 정보만 바꾼다
   function updateMe(patch) {
+    if (status !== 'playing' || localRoomNow() >= endsAt) return;
     setPlayers((list) => list.map((p) => (p.isBot ? p : { ...p, ...patch })));
   }
 
-  // 게임 중: 봇 점수를 올리고, 종료 시각이 지나면 판정한다
+  // 라운드 종료는 봇의 다음 점수 갱신을 기다리지 않고 마감 시각에 처리한다.
   useEffect(() => {
     if (status !== 'playing') return undefined;
+    const finishTimer = setTimeout(() => setStatus('finished'), Math.max(0, Math.ceil(endsAt - localRoomNow())));
     const id = setInterval(() => {
-      const now = Date.now();
-      if (now >= endsAt) {
-        setStatus('finished');
-        return;
-      }
-      if (now < startsAt) return;
+      const now = localRoomNow();
+      if (now < startsAt || now >= endsAt) return;
       setPlayers((list) =>
         list.map((p) => (p.isBot ? { ...p, score: p.score + Math.floor(Math.random() * BOT_SCORE_MAX_STEP) } : p)),
       );
     }, BOT_TICK_MS);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      clearTimeout(finishTimer);
+    };
   }, [status, startsAt, endsAt]);
 
   // 종료되면 마지막 점수로 결과를 확정한다
   useEffect(() => {
-    if (status === 'finished') setResult((prev) => prev ?? createResult(players));
-  }, [status, players]);
+    if (status === 'finished') setResult((prev) => prev ?? createResult(players, myNickname));
+  }, [status, players, myNickname]);
 
   return {
     status,
@@ -85,7 +90,7 @@ export function useLocalRoom() {
     myNickname,
     players,
     isHost: true,
-    durationSec,
+    durationSec: ROOM.DURATION_SEC,
     startsAt,
     endsAt,
     result,
@@ -95,10 +100,10 @@ export function useLocalRoom() {
     joinRoom: (nickname, code) => enterLobby(nickname, code),
     // 게임 시작: 카운트다운 뒤 시작하도록 시각을 정한다
     startGame: () => {
-      const start = Date.now() + GAME.COUNTDOWN_SEC * 1000;
+      const start = localRoomNow() + GAME.COUNTDOWN_SEC * 1000;
       setPlayers((list) => list.map((p) => createPlayer(p.nickname, p.isBot)));
       setStartsAt(start);
-      setEndsAt(start + durationSec * 1000);
+      setEndsAt(start + ROOM.DURATION_SEC * 1000);
       setResult(null);
       setStatus('playing');
     },

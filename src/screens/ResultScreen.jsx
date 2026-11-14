@@ -16,6 +16,7 @@ function prefersReducedMotion() {
 // 결과 화면: 꼴찌(커피 당번)를 먼저 보여주고, 그 아래 전체 순위를 둔다.
 export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   const view = toResultView(result);
+  const myRecord = view.rows.find((player) => player.name === result?.myNickname);
   const reduceMotion = prefersReducedMotion();
   const cardRef = useRef(null);
   const cupRef = useRef(null);
@@ -95,17 +96,38 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
         {view.loser && (
           <section ref={cardRef} className="bg-espresso px-1 pt-1 pb-2">
             <div className="bg-latte px-1 pb-1">
-              <div className="flex flex-col items-center bg-card p-6 text-center">
+              {myRecord && (
+                <div className="border-b border-border bg-card px-5 py-4">
+                  <h1 className="text-sm font-semibold text-muted-foreground">{STRINGS.RESULT_MY_RECORD}</h1>
+                  <dl className="mt-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+                    <div>
+                      <dt className="text-xs text-muted-foreground">{STRINGS.RESULT_MY_NICKNAME}</dt>
+                      <dd className="text-xl font-bold text-card-foreground">{myRecord.name}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-muted-foreground">{STRINGS.PLAY_FINAL_SCORE}</dt>
+                      <dd className="text-3xl leading-tight font-bold text-primary tabular-nums">
+                        {formatScore(myRecord.score)}<span className="ml-1 text-base">{STRINGS.RESULT_SCORE_UNIT}</span>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              )}
+              <div className={myRecord ? 'flex items-center gap-3 bg-card px-5 py-2' : 'flex flex-col items-center bg-card p-6 text-center'}>
                 <img
                   ref={cupRef}
                   src="/assets/drinks/americano.png"
                   alt={STRINGS.RESULT_AMERICANO}
                   width={100}
                   height={100}
-                  className="size-25 [image-rendering:pixelated]"
+                  className={myRecord ? 'pixel-img size-12' : 'pixel-img size-25'}
                 />
-                <h1 className="mt-4 text-sm font-semibold text-foreground">{STRINGS.RESULT_COFFEE_DUTY}</h1>
-                <p ref={nameRef} className="mt-2 text-[32px] font-bold leading-none tracking-tight text-foreground">{view.loser.name}</p>
+                <div className={myRecord ? '' : 'mt-4'}>
+                  {myRecord
+                    ? <p className="text-sm font-semibold text-foreground">{STRINGS.RESULT_COFFEE_DUTY}</p>
+                    : <h1 className="text-sm font-semibold text-foreground">{STRINGS.RESULT_COFFEE_DUTY}</h1>}
+                  <p ref={nameRef} className={myRecord ? 'font-bold' : 'mt-2 text-[32px] font-bold leading-none tracking-tight'}>{view.loser.name}</p>
+                </div>
               </div>
             </div>
           </section>

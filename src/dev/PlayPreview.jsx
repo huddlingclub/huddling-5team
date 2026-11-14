@@ -28,7 +28,7 @@ function pickRandom(list) {
 // 홈·대기실 없이 플레이 화면만 띄워보는 테스트 페이지 (주소 뒤에 ?test=play)
 export default function PlayPreview() {
   const [countdown, setCountdown] = useState(COUNTDOWN_FROM);
-  const [timeLeft, setTimeLeft] = useState(ROOM.DEFAULT_DURATION_SEC);
+  const [timeLeft, setTimeLeft] = useState(ROOM.DURATION_SEC);
   const [others, setOthers] = useState(createOthers);
   const [myScore, setMyScore] = useState(0);
   const [nextLevel, setNextLevel] = useState(1);
@@ -85,7 +85,7 @@ export default function PlayPreview() {
   // 처음 상태로 되돌려 카운트다운부터 다시 시작한다
   function handleRestart() {
     setCountdown(COUNTDOWN_FROM);
-    setTimeLeft(ROOM.DEFAULT_DURATION_SEC);
+    setTimeLeft(ROOM.DURATION_SEC);
     setOthers(createOthers());
     setMyScore(0);
     setNextLevel(1);
@@ -104,6 +104,7 @@ export default function PlayPreview() {
     const today = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     const result = {
+      myNickname: MY_NICKNAME,
       date: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
       players: players.map((p) => ({ name: p.nickname, score: p.score, finished: true })),
     };
@@ -116,7 +117,7 @@ export default function PlayPreview() {
         key={round}
         players={players}
         timeLeft={timeLeft}
-        durationSec={ROOM.DEFAULT_DURATION_SEC}
+        durationSec={ROOM.DURATION_SEC}
         myNickname={MY_NICKNAME}
         myScore={myScore}
         isGameOver={isGameOver}

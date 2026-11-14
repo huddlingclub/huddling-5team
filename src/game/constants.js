@@ -18,10 +18,7 @@ export const ROOM = {
   MIN_PLAYERS: 2,
   MAX_PLAYERS: 5,
   DEFAULT_PLAYERS: 4,
-  MIN_DURATION_SEC: 30,
-  MAX_DURATION_SEC: 300,
-  DEFAULT_DURATION_SEC: 120,
-  DURATION_STEP_SEC: 30,
+  DURATION_SEC: 120,
 };
 
 // 게임 물리 관련
@@ -91,7 +88,11 @@ export const COMBO = {
 };
 
 // 방해 요소 (장애물)
+const EVENT_DROP_INTERVAL_SEC = 15;
 export const OBSTACLE = {
+  EVENT_DROP_INTERVAL_SEC,
+  // 종료 시각과 겹치는 투하는 제외한다.
+  EVENT_DROP_COUNT: Math.ceil(ROOM.DURATION_SEC / EVENT_DROP_INTERVAL_SEC) - 1,
   // 이 거리(px) 안에서 합체가 일어나면 장애물 삭제
   CLEAR_RADIUS_PX: 40,
   // 한 컵에 쌓일 수 있는 장애물 수
