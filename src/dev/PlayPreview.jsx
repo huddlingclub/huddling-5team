@@ -99,7 +99,7 @@ export default function PlayPreview() {
   const canPlay = !isCounting && !isGameOver && !isFinished;
 
   return (
-    <div className="relative mx-auto max-w-sm">
+    <div className="relative mx-auto max-w-sm md:h-180 md:max-h-svh">
       <PlayScreen
         key={round}
         players={players}
@@ -118,20 +118,20 @@ export default function PlayPreview() {
         onComboChange={setCombo}
         onCombo={(count) => setSentAttack({ count: getAttackCount(count) })}
         onGameOver={() => setIsGameOver(true)}
+        sidebarFooter={
+          <div className="flex shrink-0 flex-col gap-1">
+            <Button size="xs" variant="outline" disabled={!canPlay} onClick={handleAttack}>
+              {STRINGS.DEV_ATTACK}
+            </Button>
+            <Button size="xs" variant="destructive" disabled={!canPlay} onClick={() => setIsGameOver(true)}>
+              {STRINGS.DEV_GAME_OVER}
+            </Button>
+            <Button size="xs" variant="secondary" onClick={handleRestart}>
+              {STRINGS.DEV_RESTART}
+            </Button>
+          </div>
+        }
       />
-
-      {/* 테스트 조작 버튼 (점수판 아래 빈자리) */}
-      <div className="absolute right-4 bottom-4 flex w-28 flex-col gap-1">
-        <Button size="xs" variant="outline" disabled={!canPlay} onClick={handleAttack}>
-          {STRINGS.DEV_ATTACK}
-        </Button>
-        <Button size="xs" variant="destructive" disabled={!canPlay} onClick={() => setIsGameOver(true)}>
-          {STRINGS.DEV_GAME_OVER}
-        </Button>
-        <Button size="xs" variant="secondary" onClick={handleRestart}>
-          {STRINGS.DEV_RESTART}
-        </Button>
-      </div>
     </div>
   );
 }
