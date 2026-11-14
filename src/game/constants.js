@@ -34,6 +34,22 @@ export const GAME = {
   MAX_DRINKS_IN_CUP: 60,
   // 기본 원두 반지름 (px) - 다른 단계는 size 배수
   BASE_RADIUS: 16,
+  // 연속 낙하 사이 최소 간격 (ms)
+  DROP_COOLDOWN_MS: 500,
+  // 손에 든 음료와 컵 위쪽 사이 간격 (px)
+  DROP_TOP_GAP: 4,
+  // 컵 벽 두께 (px, 화면 밖에 있어 보이지 않음)
+  WALL_THICKNESS: 60,
+  // 음료 탄성 (0 = 안 튐, 1 = 그대로 튐)
+  RESTITUTION: 0.2,
+  // 음료 마찰
+  FRICTION: 0.3,
+  // 한 프레임에 진행하는 최대 시간 (ms) - 탭을 벗어났다 돌아올 때 튀는 것 방지
+  MAX_FRAME_MS: 33,
+  // 이 단계부터 원 안에 음료 이름을 적는다
+  LABEL_MIN_LEVEL: 3,
+  // 음료 이름 글자 크기 (px)
+  LABEL_FONT_PX: 12,
 };
 
 // 방 코드 생성용 문자 (0, O, 1, I, L 제외)
