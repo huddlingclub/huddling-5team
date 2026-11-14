@@ -2,13 +2,25 @@ import { useEffect, useState } from 'react';
 import HomeScreen from '#screens/HomeScreen.jsx';
 import LobbyScreen from '#screens/LobbyScreen.jsx';
 import PlayScreen from '#screens/PlayScreen.jsx';
-import ResultScreen from '#screens/ResultScreen.jsx';
+import ResultPage, { isResultPath } from '#pages/ResultPage.jsx';
 import { GAME } from '#game/constants.js';
 import { getAttackCount } from '#game/engine.js';
 import { useLocalRoom } from '#dev/useLocalRoom.js';
 
+const RESULT_STORAGE_KEY = 'encantado-result';
+
 // 화면에 보이는 시간을 다시 계산하는 주기 (ms)
 const CLOCK_TICK_MS = 200;
+
+// /result 주소로 바로 들어왔을 때 보여줄, 저장해 둔 결과를 읽는다
+function readStoredResult() {
+  try {
+    const raw = sessionStorage.getItem(RESULT_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 // 앱 시작, 화면 전환 상태, 게임과 방 모듈 연결
 export default function App() {
@@ -34,6 +46,24 @@ export default function App() {
     const id = setTimeout(() => setSentAttack(null), GAME.NOTICE_MS);
     return () => clearTimeout(id);
   }, [sentAttack]);
+
+  // 결과가 나오면 /result 주소에서도 다시 볼 수 있게 저장해 둔다
+  useEffect(() => {
+    if (room.result) sessionStorage.setItem(RESULT_STORAGE_KEY, JSON.stringify(room.result));
+  }, [room.result]);
+
+  // /result 주소로 바로 들어온 경우: 저장된 결과(없으면 예시)를 보여준다
+  if (room.status === 'idle' && isResultPath()) {
+    return (
+      <ResultPage
+        result={readStoredResult() ?? undefined}
+        onGoHome={() => {
+          sessionStorage.removeItem(RESULT_STORAGE_KEY);
+          window.location.assign('/');
+        }}
+      />
+    );
+  }
 
   if (room.status === 'idle') {
     return <HomeScreen onCreateRoom={room.createRoom} onJoinRoom={room.joinRoom} />;
@@ -86,15 +116,9 @@ export default function App() {
     );
   }
 
+  // 제한 시간이 끝나면 게임을 멈추고 결과 화면으로 넘어간다
   if (room.status === 'finished' && room.result) {
-    return (
-      <ResultScreen
-        rankings={room.result.rankings}
-        coffeeLoser={room.result.coffeeLoser}
-        onPlayAgain={room.playAgain}
-        onGoHome={room.leave}
-      />
-    );
+    return <ResultPage result={room.result} onGoHome={room.leave} />;
   }
 
   return null;

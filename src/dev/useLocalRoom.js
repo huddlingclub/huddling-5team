@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'react';
 import { CODE_CHARS, CODE_LENGTH, GAME, ROOM } from '#game/constants.js';
-import { judge } from '#game/judge.js';
 
 // 테스트용 가짜 값 (실제 게임 숫자가 아님)
 const BOT_NICKNAMES = ['지민(봇)', '하늘(봇)'];
@@ -14,6 +13,16 @@ const BOT_MAX_LEVEL = 3;
 // 무작위 방 코드를 만든다
 function createCode() {
   return Array.from({ length: CODE_LENGTH }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join('');
+}
+
+// 결과 화면(ResultScreen)이 받는 모양으로 최종 결과를 만든다
+function createResult(players) {
+  const today = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return {
+    date: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
+    players: players.map((p) => ({ name: p.nickname, score: p.score, finished: true })),
+  };
 }
 
 // 0점인 참가자 하나를 만든다
@@ -62,9 +71,9 @@ export function useLocalRoom() {
     return () => clearInterval(id);
   }, [status, startsAt, endsAt]);
 
-  // 종료되면 마지막 점수로 순위와 커피 담당을 정한다
+  // 종료되면 마지막 점수로 결과를 확정한다
   useEffect(() => {
-    if (status === 'finished') setResult((prev) => prev ?? judge(players));
+    if (status === 'finished') setResult((prev) => prev ?? createResult(players));
   }, [status, players]);
 
   return {
