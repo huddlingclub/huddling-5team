@@ -163,6 +163,7 @@ export default function PlayScreen({
   const minScore = Math.min(...scores);
   // 점수 차이가 생긴 뒤에만 최저 점수자를 표시한다
   const hasGap = players.length > 1 && Math.max(...scores) > minScore;
+  const showMyCoffeeRisk = hasGap && myScore === minScore && !isGameOver && !isTimeUp;
   const isLowTime = timeLeft <= LOW_TIME_SEC;
   const isCounting = countdown !== null;
 
@@ -198,7 +199,10 @@ export default function PlayScreen({
             </div>
             <div className="flex min-w-0 flex-col items-center">
               <span className="text-xs text-muted-foreground">{STRINGS.PLAY_MY_SCORE}</span>
-              <span className="max-w-full truncate font-mono text-xl font-bold tabular-nums md:text-2xl" title={String(myScore)}>{myScore}</span>
+              <div className="flex max-w-full items-center gap-1">
+                <span className="truncate font-mono text-xl font-bold tabular-nums md:text-2xl" title={String(myScore)}>{myScore}</span>
+                {showMyCoffeeRisk && <Badge variant="destructive" className="md:hidden">{STRINGS.PLAY_COFFEE_RISK}</Badge>}
+              </div>
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <NextDrink level={nextLevel} />
