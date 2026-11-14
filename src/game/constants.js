@@ -32,6 +32,14 @@ export const GAME = {
   GO_SHOW_MS: 700,
   // 공격 알림을 띄우는 시간 (ms)
   NOTICE_MS: 1500,
+  // 시간이 끝난 뒤 "시간종료!"를 보여주다가 리더보드로 넘어가는 시간 (ms)
+  TIME_UP_SHOW_MS: 3000,
+  // 합체로 막 생긴 음료가 다시 합쳐지기까지 기다리는 시간 (ms) - 생기자마자 또 합쳐져 안 보이는 것 방지
+  MERGE_LOCK_MS: 250,
+  // 합체로 생긴 음료가 작게 시작해 제 크기로 커지는 시간 (ms)
+  MERGE_POP_MS: 180,
+  // 합체로 생긴 음료가 처음 그려지는 크기 비율 (1 = 제 크기)
+  MERGE_POP_START_SCALE: 0.6,
   // 경고선 초과 허용 시간 (ms)
   DANGER_TIMEOUT_MS: 2000,
   // 경고선 높이 (컵 위쪽에서 px)
