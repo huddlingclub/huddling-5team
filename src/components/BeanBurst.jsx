@@ -35,13 +35,19 @@ function makeSprites(image) {
   );
 }
 
-function makeBeans(count) {
-  return Array.from({ length: count }, () => {
-    const angle = Math.PI + Math.random() * Math.PI;
-    const speed = 520 + Math.random() * 760;
+// 좌·우에서 안쪽·위쪽으로 터지게 한다. fromLeft면 왼쪽, 아니면 오른쪽에서 출발.
+function makeBeans(count, width, midY) {
+  return Array.from({ length: count }, (_, i) => {
+    const fromLeft = i % 2 === 0;
+    const speed = 480 + Math.random() * 620;
+    const up = -0.55 - Math.random() * 0.7;
+    const inward = (0.45 + Math.random() * 0.55) * (fromLeft ? 1 : -1);
+    const length = Math.hypot(inward, up);
     return {
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
+      x: fromLeft ? -24 : width + 24,
+      y: midY + (Math.random() - 0.5) * 80,
+      vx: (inward / length) * speed,
+      vy: (up / length) * speed,
       spin: (Math.random() - 0.5) * 14,
       rotation: Math.random() * Math.PI * 2,
       sprite: Math.floor(Math.random() * SIZES.length * TONE_TOKENS.length),
@@ -49,7 +55,7 @@ function makeBeans(count) {
   });
 }
 
-// 컵 위치에서 원두가 위쪽 사방으로 터졌다가 중력으로 떨어진다. 클릭은 막지 않는다.
+// 화면 좌우에서 원두가 폭죽처럼 터졌다가 중력으로 떨어진다. 클릭은 막지 않는다.
 export default function BeanBurst({ originRef }) {
   const canvasRef = useRef(null);
 
@@ -68,9 +74,7 @@ export default function BeanBurst({ originRef }) {
     ctx.imageSmoothingEnabled = false;
 
     const count = 40 + Math.floor(Math.random() * 21);
-    const beans = makeBeans(count);
-    let originX = 0;
-    let originY = 0;
+    let beans = [];
 
     let frame = 0;
     let startAt = 0;
@@ -86,8 +90,8 @@ export default function BeanBurst({ originRef }) {
       const alpha = elapsed < 1600 ? 1 : 1 - (elapsed - 1600) / 400;
       ctx.globalAlpha = alpha;
       beans.forEach((bean) => {
-        const x = originX + bean.vx * t;
-        const y = originY + bean.vy * t + 0.5 * GRAVITY * t * t;
+        const x = bean.x + bean.vx * t;
+        const y = bean.y + bean.vy * t + 0.5 * GRAVITY * t * t;
         const sprite = sprites[bean.sprite];
         ctx.save();
         ctx.translate(x, y);
@@ -101,8 +105,8 @@ export default function BeanBurst({ originRef }) {
     let sprites = [];
     function arm() {
       const rect = origin.getBoundingClientRect();
-      originX = rect.left + rect.width / 2;
-      originY = rect.top + rect.height / 2;
+      const midY = rect.top + rect.height / 2;
+      beans = makeBeans(count, width, midY);
       sprites = makeSprites(image);
       frame = requestAnimationFrame((now) => {
         startAt = now;

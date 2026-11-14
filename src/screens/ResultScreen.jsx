@@ -87,11 +87,11 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   }, [reduceMotion]);
 
   return (
-    <div
-      className="min-h-svh bg-background bg-cover bg-center bg-no-repeat [image-rendering:pixelated]"
-      style={{ backgroundImage: `url(${cafeBackground})` }}
-    >
-      <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 px-4 py-4 [image-rendering:auto]">
+    <div className="min-h-svh bg-background">
+      <div
+        className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 bg-cover bg-center bg-no-repeat px-4 py-4 [image-rendering:pixelated]"
+        style={{ backgroundImage: `url(${cafeBackground})` }}
+      >
         {view.loser && !reduceMotion && <BeanBurst originRef={cupRef} />}
         {view.loser && (
           <section ref={cardRef} className="bg-espresso px-1 pt-1 pb-2">
@@ -122,7 +122,7 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
                 data-loser={row.isLoser ? 'true' : undefined}
                 className={
                   row.isLoser
-                    ? 'mt-1 flex items-center gap-3 rounded-lg bg-result-loser px-3 py-2.5 text-foreground'
+                    ? 'mt-1 flex items-center gap-3 rounded-lg border-2 border-result-loser-border bg-result-loser px-3 py-2.5 text-foreground'
                     : 'flex items-center gap-3 border-b border-border px-3 py-2.5 text-foreground'
                 }
               >

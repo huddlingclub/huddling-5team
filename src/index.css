@@ -38,6 +38,7 @@
     --color-frappe: var(--frappe);
     --color-unicorn: var(--unicorn);
     --color-result-loser: var(--result-loser);
+    --color-result-loser-border: var(--result-loser-border);
 
     /* 차트 (점수판용) */
     --color-chart-1: var(--chart-1);
@@ -87,6 +88,7 @@
     --frappe: oklch(0.65 0.1 160);
     --unicorn: oklch(0.7 0.2 330);
     --result-loser: #f1e6da;
+    --result-loser-border: #7f4413;
 
     /* 점수판 차트 색상 */
     --chart-1: oklch(0.45 0.1 55);
@@ -124,6 +126,7 @@
     --frappe: oklch(0.7 0.1 160);
     --unicorn: oklch(0.75 0.2 330);
     --result-loser: #f1e6da;
+    --result-loser-border: #7f4413;
 
     --chart-1: oklch(0.55 0.12 55);
     --chart-2: oklch(0.65 0.08 60);
