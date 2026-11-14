@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "approvedAt": "2026-11-14",
+  "style": "warm pixel cafe",
+  "figma": "https://www.figma.com/design/52Z1kXW8xBte1H076f8MOL/portfolio?node-id=2040-96",
+  "boundsFormat": "[left, top, rightExclusive, bottomExclusive]",
+  "assets": [
+    {
+      "id": "bean",
+      "level": 1,
+      "name": "원두",
+      "file": "drinks/bean.png",
+      "width": 128,
+      "height": 128,
+      "format": "RGBA PNG",
+      "contentBounds": [
+        8,
+        11,
+        120,
+        116
+      ],
+      "sha256": "3774db6b48c8cce5c3e10c9d7b623d9467ff35c18583cb55e1e8b436b129893d"
+    },
+    {
+      "id": "espresso",
+      "level": 2,
+      "name": "에스프레소",
+      "file": "drinks/espresso.png",
+      "width": 128,
+      "height": 128,
+      "format": "RGBA PNG",
+      "contentBounds": [
+        8,
+        15,
+        120,
+        112
+      ],
+      "sha256": "53fd606e6fef17e7d60a8054b0b5bec7199c0f1aeabd346dcd20214377ca6558"
+    },
+    {
+      "id": "americano",
+      "level": 3,
+      "name": "아이스 아메리카노",
+      "file": "drinks/americano.png",
+      "width": 128,
+      "height": 128,
+      "format": "RGBA PNG",
+      "contentBounds": [
+        25,
+        8,
+        103,
+        120
+      ],
+      "sha256": "2b6f1b23d3bd15c069300ff0fa9228bcdf5e6c76e5df49463b67a0bf31068197"
+    },
+    {
+      "id": "latte",
+      "level": 4,
+      "name": "라떼",
+      "file": "drinks/latte.png",
+      "width": 128,
+      "height": 128,
+      "format": "RGBA PNG",
+      "contentBounds": [
+        8,
+        14,
+        120,
+        114
+      ],
+      "sha256": "cd9acdcd68c9795e1959b859a626f5d225549a33aeef449879c6686ab957980c"
+    },
+    {
+      "id": "frappe",
+      "level": 5,
+      "name": "커피 프라페",
+      "file": "drinks/frappe.png",
+      "width": 128,
+      "height": 128,
+      "format": "RGBA PNG",
+      "contentBounds": [
+        29,
+        8,
+        99,
+        120
+      ],
+      "sha256": "2f030e559d2387248167bba9036937a2ebe3f818a479861518963e8785094263"
+    },
+    {
+      "id": "unicorn",
+      "level": 6,
+      "name": "유니콘 프라페",
+      "file": "drinks/unicorn.png",
+      "width": 128,
+      "height": 128,
+      "format": "RGBA PNG",
+      "contentBounds": [
+        29,
+        8,
+        99,
+        120
+      ],
+      "sha256": "aa0ceb0eac660f1d22ee57b58cec9d39a734095974fe38d337be583cbb083adb"
+    }
+  ]
+}
