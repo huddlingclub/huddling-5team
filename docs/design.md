@@ -20,7 +20,7 @@
 
 ### 원본을 찾는 순서
 
-1. [승인된 픽셀 Figma 시안](https://www.figma.com/design/52Z1kXW8xBte1H076f8MOL/portfolio?node-id=2040-96): `huddling-club` 페이지의 `03 커피내기 머지 · 픽셀 아트 6단계` 섹션이에요. `04 픽셀 아트 원본 · 투명 PNG 컴포넌트`에 개별 컴포넌트가 있어요.
+1. [승인된 픽셀 Figma 시안](https://www.figma.com/design/u8lS8N31f0IdLLsnqCdzZq/5%EC%A1%B0-%ED%94%BC%EA%B7%B8%EB%A7%88-%EC%98%A4%EC%9D%B4%EC%8B%9C?node-id=9-17): `Page 1`의 `03 커피내기 머지 · 픽셀 아트 6단계` 섹션이에요. `04 픽셀 아트 원본 · 투명 PNG 컴포넌트`에 개별 컴포넌트가 있어요. 최신 공유 위치이며 제목·단계명·배치는 수정할 수 있어요.
 2. 이 저장소의 [승인 에셋 목록](design-assets/approved-assets.json)과 아래 이미지가 다른 PC에서도 열리는 기준 사본이에요.
 3. [PRD.md](PRD.md)는 서비스 흐름과 룰, [constants.js](../src/game/constants.js)는 현재 단계 이름·수치, [index.css](../src/index.css)는 UI 토큰, [strings.js](../src/strings.js)는 화면 문구의 원본이에요.
 4. 구현 방식과 수정 범위는 [AGENTS.md](../AGENTS.md)를 따라요. 현재 프로젝트는 React + Vite + Tailwind CSS v4 + shadcn/ui예요.
@@ -234,7 +234,7 @@ UI는 `src/index.css`의 토큰을 사용해요. 아래 HEX는 현재 라이트 
 - 이 문서와 에셋은 팀 공유용 제품 자료예요. 개인 작업 경로·계정 선택 정보·실행 스크립트·외부 도구 세션 정보는 필요하지 않아요.
 - 새 패키지·글꼴·UI 라이브러리를 넣지 않고 기존 컴포넌트를 재사용해요.
 - 먼저 맡은 화면·자산부터 작업해요. 공통 토큰·문구·상수·프로토콜을 바꿔야 한다면 담당자와 수정 범위를 맞춰요.
-- Figma의 `03` 픽셀 검토판과 이 문서를 기준으로 해요. `01` 벡터 검토판은 이전 기록이에요.
+- 새 공유 Figma 파일의 `03` 픽셀 검토판과 이 문서를 기준으로 해요. `04` 원본 섹션에서 개별 커피 컴포넌트를 가져와요.
 - 디자인 작업과 게임 수치 조정을 한 변경에 섞지 않아요. 화면 스타일을 바꾸기 위해 상수·승패·공격 규칙을 변경하지 않아요.
 
 다른 제작자에게 전달할 시작 문장:
