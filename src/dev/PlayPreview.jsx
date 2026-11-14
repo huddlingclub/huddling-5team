@@ -120,6 +120,7 @@ export default function PlayPreview() {
         myNickname={MY_NICKNAME}
         myScore={myScore}
         isGameOver={isGameOver}
+        isTimeUp={isFinished}
         countdown={countdown}
         nextLevel={nextLevel}
         notice={notice}

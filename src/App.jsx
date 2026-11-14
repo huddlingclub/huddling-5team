@@ -30,8 +30,11 @@ export default function App() {
   const [nextLevel, setNextLevel] = useState(1);
   const [combo, setCombo] = useState(0);
   const [sentAttack, setSentAttack] = useState(null);
+  // 시간이 끝난 뒤 "시간종료!"를 지나 리더보드를 열었는지
+  const [isResultOpen, setIsResultOpen] = useState(false);
 
   const isPlaying = room.status === 'playing';
+  const isFinished = room.status === 'finished';
 
   // 게임 중에는 시계를 돌려 카운트다운과 남은 시간을 갱신한다
   useEffect(() => {
@@ -51,6 +54,13 @@ export default function App() {
   useEffect(() => {
     if (room.result) sessionStorage.setItem(RESULT_STORAGE_KEY, JSON.stringify(room.result));
   }, [room.result]);
+
+  // 시간이 끝나면 "시간종료!"를 잠깐 보여준 뒤 리더보드로 넘어간다
+  useEffect(() => {
+    if (!isFinished) return undefined;
+    const id = setTimeout(() => setIsResultOpen(true), GAME.TIME_UP_SHOW_MS);
+    return () => clearTimeout(id);
+  }, [isFinished]);
 
   // /result 주소로 바로 들어온 경우: 저장된 결과(없으면 예시)를 보여준다
   if (room.status === 'idle' && isResultPath()) {
@@ -78,6 +88,7 @@ export default function App() {
         onStart={() => {
           setCombo(0);
           setSentAttack(null);
+          setIsResultOpen(false);
           setNow(Date.now());
           room.startGame();
         }}
@@ -85,14 +96,15 @@ export default function App() {
     );
   }
 
-  if (room.status === 'playing') {
+  // 게임 중이거나, 시간이 끝나 "시간종료!"를 보여주는 동안에는 플레이 화면을 그대로 둔다
+  if (isPlaying || (isFinished && !isResultOpen)) {
     const me = room.players.find((p) => p.nickname === room.myNickname);
     const msToStart = room.startsAt - now;
     // 시작 전에는 3-2-1, 시작 직후 잠깐은 GO(0), 그 뒤에는 표시 없음(null)
     let countdown = null;
     if (msToStart > 0) countdown = Math.ceil(msToStart / 1000);
     else if (msToStart > -GAME.GO_SHOW_MS) countdown = 0;
-    const timeLeft = Math.max(0, (room.endsAt - Math.max(now, room.startsAt)) / 1000);
+    const timeLeft = isFinished ? 0 : Math.max(0, (room.endsAt - Math.max(now, room.startsAt)) / 1000);
 
     return (
       <PlayScreen
@@ -103,6 +115,7 @@ export default function App() {
         myNickname={room.myNickname}
         myScore={me?.score ?? 0}
         isGameOver={me?.alive === false}
+        isTimeUp={isFinished}
         countdown={countdown}
         nextLevel={nextLevel}
         combo={combo}
@@ -111,13 +124,14 @@ export default function App() {
         onNextLevel={setNextLevel}
         onComboChange={setCombo}
         onCombo={(count) => setSentAttack({ count: getAttackCount(count) })}
-        onGameOver={room.sendGameOver}
+        onGameOver={isFinished ? undefined : room.sendGameOver}
+        onShowResult={() => setIsResultOpen(true)}
       />
     );
   }
 
-  // 제한 시간이 끝나면 게임을 멈추고 결과 화면으로 넘어간다
-  if (room.status === 'finished' && room.result) {
+  // "시간종료!"를 지나면 결과 화면으로 넘어간다
+  if (isFinished && room.result) {
     return <ResultPage result={room.result} onGoHome={room.leave} />;
   }
 
