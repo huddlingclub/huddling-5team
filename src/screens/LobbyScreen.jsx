@@ -48,10 +48,10 @@ export default function LobbyScreen({ roomCode, players, isHost, maxPlayers, myI
   return (
     <main className="min-h-svh bg-background">
       <div
-        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full max-w-sm flex-col items-center justify-end gap-4 bg-cover bg-center px-4 py-8"
+        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full flex-col items-center justify-end gap-4 bg-cover bg-center px-4 py-8 md:max-w-sm"
         style={{ backgroundImage: "url('/assets/lobby-bg.png')" }}
       >
-        <Card className="cafe-panel w-full max-w-xs">
+        <Card className="cafe-panel w-full md:max-w-xs">
           <CardContent className="flex flex-col items-center gap-4">
             <h1 className="self-start text-xl font-bold">{STRINGS.LOBBY_TITLE}</h1>
             <div className="flex w-full flex-col items-center rounded-lg bg-secondary p-3 text-secondary-foreground">
@@ -70,7 +70,7 @@ export default function LobbyScreen({ roomCode, players, isHost, maxPlayers, myI
             </div>
             {copyHint && <p role="status" className="text-sm text-muted-foreground">{STRINGS.LOBBY_COPY_HINT}</p>}
             {/* 참가자 슬롯 */}
-            <div className="flex flex-col gap-2 w-full max-w-xs">
+            <div className="flex w-full flex-col gap-2 md:max-w-xs">
               {Array.from({ length: slotCount }, (_, i) => {
                 const player = players[i];
                 if (player) {
@@ -118,7 +118,7 @@ export default function LobbyScreen({ roomCode, players, isHost, maxPlayers, myI
             {/* 시작 버튼 (호스트만) */}
             {isHost ? (
               <Button
-                className="w-full max-w-xs pixel-shadow h-13 text-base"
+                className="pixel-shadow h-13 w-full text-base md:max-w-xs"
                 disabled={!canStart}
                 onClick={onStart}
               >

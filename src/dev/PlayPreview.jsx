@@ -111,7 +111,7 @@ export default function PlayPreview() {
   }
 
   return (
-    <div className="relative mx-auto max-w-sm md:h-180 md:max-h-svh">
+    <div className="relative mx-auto w-full md:h-180 md:max-h-svh md:max-w-sm">
       <PlayScreen
         key={round}
         players={players}
@@ -132,7 +132,7 @@ export default function PlayPreview() {
         onCombo={(count) => setSentAttack({ count: getAttackCount(count) })}
         onGameOver={() => setIsGameOver(true)}
         sidebarFooter={
-          <div className="flex shrink-0 flex-col gap-1">
+          <div className="flex shrink-0 gap-1 *:min-w-0 *:flex-1 md:flex-col">
             <Button size="xs" variant="outline" disabled={!canPlay} onClick={handleAttack}>
               {STRINGS.DEV_ATTACK}
             </Button>

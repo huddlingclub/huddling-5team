@@ -162,7 +162,10 @@
 
 /* 1080×2340 원본의 비율과 로고·START 위치를 유지하는 세로 메인 화면 */
 @utility home-scene {
-    width: min(100%, max(320px, calc(100svh * 6 / 13)));
+    width: 100%;
+    @variant md {
+        width: min(100%, max(320px, calc(100svh * 6 / 13)));
+    }
     height: 100svh;
     min-height: 25rem;
     background: var(--home-art) center bottom / cover no-repeat;

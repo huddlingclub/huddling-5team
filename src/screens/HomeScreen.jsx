@@ -22,7 +22,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }) {
       <div className="home-scene relative isolate mx-auto overflow-hidden">
         {started ? (
           <div className="absolute inset-0 flex flex-col items-center overflow-y-auto bg-espresso/25 px-4 py-6">
-            <Card className="cafe-panel my-auto w-full max-w-xs shrink-0">
+            <Card className="cafe-panel my-auto w-full shrink-0 md:max-w-xs">
               <CardContent className="flex flex-col gap-4">
                 <Button variant="ghost" className="h-11 self-start" onClick={() => setStarted(false)}>
                   <ArrowLeft aria-hidden="true" />
