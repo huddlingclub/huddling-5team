@@ -68,6 +68,9 @@ export const STRINGS = {
   PLAY_ATTACK_NOTICE: (nickname, count) => `${nickname}님이 장애물 ${count}개를 보냈어요`,
 
   PLAY_MERGE_SCORES: '합체 점수',
+  PLAY_MERGE_HELP: '합체 점수표 열기',
+  PLAY_MERGE_HELP_DESCRIPTION: '같은 음료를 합치면 다음 단계가 돼요. 점수표를 보는 동안에도 게임 시간은 계속 흘러요.',
+  PLAY_SCORE_GAIN: '획득 점수',
   PLAY_NO_SCORE: '—',
   // 합체 점수 문구 만들기
   PLAY_SCORE_PLUS: (score) => `+${score}`,

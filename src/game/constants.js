@@ -32,6 +32,8 @@ export const GAME = {
   GO_SHOW_MS: 700,
   // 공격 알림을 띄우는 시간 (ms)
   NOTICE_MS: 1500,
+  // 합체 후 획득 점수를 화면에 보여주는 시간 (ms)
+  SCORE_GAIN_SHOW_MS: 900,
   // 장애물이 날아올 때 도둑이 던질 준비 자세로 서 있는 시간 (ms) - 그 뒤 던지는 자세로 바뀐다
   THIEF_WINDUP_MS: 350,
   // 시간이 끝난 뒤 "시간종료!"를 보여주다가 리더보드로 넘어가는 시간 (ms)

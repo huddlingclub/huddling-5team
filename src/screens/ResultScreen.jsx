@@ -88,7 +88,7 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   return (
     <main className="min-h-svh bg-background">
       <div
-        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full max-w-sm flex-col gap-4 bg-cover bg-center bg-no-repeat p-4"
+        className="cafe-interior pixel-img mx-auto flex min-h-svh w-full flex-col gap-4 bg-cover bg-center bg-no-repeat p-4 md:max-w-sm"
         style={{ backgroundImage: `url(${cafeBackground})` }}
       >
         {view.loser && !reduceMotion && <BeanBurst originRef={cupRef} />}

@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Timer } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { CircleHelp, Coffee, Timer } from 'lucide-react';
 import { Badge } from '#components/ui/badge.jsx';
 import { Button } from '#components/ui/button.jsx';
 import { Card, CardContent } from '#components/ui/card.jsx';
 import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
+import Modal from '#components/Modal.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
 import { COMBO, DRINKS, GAME, ROOM, UNICORN_BONUS } from '#game/constants.js';
 import { DRINK_SPRITES, PLAY_BACKGROUNDS, THIEF_SPRITES } from '#game/sprites.js';
@@ -25,15 +26,15 @@ function NextDrink({ level }) {
   const drink = DRINKS.find((d) => d.level === level) ?? DRINKS[0];
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center gap-0.5 md:flex-row md:gap-2">
       <div className="flex flex-col items-end">
         <span className="text-xs text-muted-foreground">{STRINGS.PLAY_NEXT_DRINK}</span>
-        <span className="text-sm font-medium">{drink.name}</span>
+        <span className="hidden text-sm font-medium md:block">{drink.name}</span>
       </div>
       <img
         src={DRINK_SPRITES[drink.level].url}
         alt={drink.name}
-        className="size-10 shrink-0 [image-rendering:pixelated]"
+        className="size-8 shrink-0 [image-rendering:pixelated] md:size-10"
       />
     </div>
   );
@@ -52,13 +53,13 @@ function DrinkIcon({ drink, className }) {
 }
 
 // 음료가 만들어질 때 얻는 점수 표 (마지막 줄은 최종 단계끼리 만났을 때 보너스)
-function MergeScoreTable() {
+function MergeScoreTable({ showTitle = true }) {
   const lastDrink = DRINKS[DRINKS.length - 1];
 
   return (
     <Card size="sm">
       <CardContent className="flex flex-col gap-1.5">
-        <span className="text-xs text-muted-foreground">{STRINGS.PLAY_MERGE_SCORES}</span>
+        {showTitle && <span className="text-xs text-muted-foreground">{STRINGS.PLAY_MERGE_SCORES}</span>}
         {DRINKS.map((drink) => (
           <div key={drink.level} className="flex items-center justify-between gap-2">
             <DrinkIcon drink={drink} />
@@ -141,16 +142,33 @@ export default function PlayScreen({
   onGameOver,
   onShowResult,
 }) {
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [scoreGain, setScoreGain] = useState(null);
+  const previousScore = useRef(myScore);
+
+  useEffect(() => {
+    const gain = myScore - previousScore.current;
+    previousScore.current = myScore;
+    if (gain <= 0) {
+      setScoreGain(null);
+      return undefined;
+    }
+    setScoreGain(gain);
+    const id = setTimeout(() => setScoreGain(null), GAME.SCORE_GAIN_SHOW_MS);
+    return () => clearTimeout(id);
+  }, [myScore]);
+
   const scores = players.map((p) => p.score ?? 0);
   const maxScore = Math.max(...scores, 1);
   const minScore = Math.min(...scores);
   // 점수 차이가 생긴 뒤에만 최저 점수자를 표시한다
   const hasGap = players.length > 1 && Math.max(...scores) > minScore;
+  const showMyCoffeeRisk = hasGap && myScore === minScore && !isGameOver && !isTimeUp;
   const isLowTime = timeLeft <= LOW_TIME_SEC;
   const isCounting = countdown !== null;
 
   return (
-    <main className="relative isolate mx-auto flex h-svh w-full max-w-sm flex-col gap-3 p-3 sm:p-4 md:h-180 md:max-h-svh">
+    <main className="relative isolate mx-auto flex h-svh w-full min-w-0 flex-col gap-2 p-2 md:h-180 md:max-h-svh md:max-w-sm md:gap-3 md:p-4">
       {/* 화면 전체에 까는 카페 배경 */}
       <picture className="pointer-events-none fixed inset-0 -z-10">
         <source media={PLAY_BACKGROUNDS.desktop.media} srcSet={PLAY_BACKGROUNDS.desktop.url} />
@@ -166,12 +184,12 @@ export default function PlayScreen({
       {/* 상단: 남은 시간 + 내 점수 + 다음 음료 */}
       <Card size="sm" className="cafe-panel">
         <CardContent className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2 md:gap-3">
             <div className="flex flex-col">
               <span className="text-xs text-muted-foreground">{STRINGS.PLAY_TIME_LEFT}</span>
               <span
                 className={cn(
-                  'flex items-center gap-1 font-mono text-2xl font-bold tabular-nums',
+                  'flex items-center gap-1 font-mono text-xl font-bold tabular-nums md:text-2xl',
                   isLowTime && 'text-destructive',
                 )}
               >
@@ -179,11 +197,24 @@ export default function PlayScreen({
                 {formatTime(timeLeft)}
               </span>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex min-w-0 flex-col items-center">
               <span className="text-xs text-muted-foreground">{STRINGS.PLAY_MY_SCORE}</span>
-              <span className="font-mono text-2xl font-bold tabular-nums">{myScore}</span>
+              <div className="flex max-w-full items-center gap-1">
+                <span className="truncate font-mono text-xl font-bold tabular-nums md:text-2xl" title={String(myScore)}>{myScore}</span>
+                {showMyCoffeeRisk && <Badge variant="destructive" className="md:hidden">{STRINGS.PLAY_COFFEE_RISK}</Badge>}
+              </div>
             </div>
-            <NextDrink level={nextLevel} />
+            <div className="flex shrink-0 items-center gap-1">
+              <NextDrink level={nextLevel} />
+              <Button
+                variant="ghost"
+                className="size-11 p-0 md:hidden"
+                aria-label={STRINGS.PLAY_MERGE_HELP}
+                onClick={() => setIsHelpOpen(true)}
+              >
+                <CircleHelp aria-hidden="true" />
+              </Button>
+            </div>
           </div>
           <Progress
             value={Math.max(0, Math.min((timeLeft / durationSec) * 100, 100))}
@@ -193,10 +224,47 @@ export default function PlayScreen({
         </CardContent>
       </Card>
 
+      {/* 모바일은 상대 점수를 위로 모아 게임판의 가로 공간을 확보한다. */}
+      <ol aria-label={STRINGS.PLAY_SCOREBOARD} className="flex min-w-0 shrink-0 gap-1.5 md:hidden">
+        {players.filter((p) => p.nickname !== myNickname).map((p, i) => {
+          const isLoser = hasGap && (p.score ?? 0) === minScore;
+          return (
+            <li key={i} className={cn('min-w-0 flex-1 rounded-lg border bg-card px-2 py-1 text-center', isLoser ? 'border-destructive' : 'border-border', p.alive === false && 'opacity-60')}>
+              <div className="flex min-w-0 items-center justify-center gap-1">
+                <span className={cn('truncate text-xs', p.alive === false && 'line-through')} title={p.nickname}>{p.nickname}</span>
+                {isLoser && p.alive !== false && <Coffee role="img" aria-label={STRINGS.PLAY_COFFEE_RISK} className="size-3 shrink-0 text-destructive" />}
+              </div>
+              <span className="block truncate font-mono text-sm font-semibold tabular-nums">{p.score ?? 0}</span>
+              {p.alive === false && <span className="sr-only">{STRINGS.PLAY_GAME_OVER}</span>}
+            </li>
+          );
+        })}
+      </ol>
+
+      <Modal
+        open={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+        title={STRINGS.PLAY_MERGE_SCORES}
+        description={STRINGS.PLAY_MERGE_HELP_DESCRIPTION}
+        contentClassName="max-h-svh overflow-y-auto"
+      >
+        <MergeScoreTable showTitle={false} />
+      </Modal>
+
       {/* 아래: 컵(왼쪽) + 점수판(오른쪽) */}
       <div className="flex min-h-0 flex-1 gap-3">
         {/* 컵(게임판) */}
         <div className="board-frame relative h-full min-w-0 flex-1 overflow-hidden">
+          {scoreGain !== null && !isGameOver && !isTimeUp && (
+            <span
+              key={myScore}
+              role="status"
+              aria-label={STRINGS.PLAY_SCORE_GAIN}
+              className="pointer-events-none absolute top-28 left-1/2 z-20 -translate-x-1/2 animate-in rounded-lg bg-card/90 px-3 py-1 font-mono text-lg font-bold text-primary fade-in slide-in-from-bottom-2 motion-reduce:animate-none"
+            >
+              {STRINGS.PLAY_SCORE_PLUS(scoreGain)}
+            </span>
+          )}
           {/* 경고선 */}
           <div
             className="pointer-events-none absolute inset-x-0 z-10 flex -translate-y-1/2 items-center gap-2 px-2"
@@ -289,7 +357,7 @@ export default function PlayScreen({
           )}
         </div>
         {/* 점수판 + 합체 점수표 (컵 오른쪽) */}
-        <div className="flex min-h-0 w-28 shrink-0 flex-col gap-3 p-px">
+        <div className="hidden min-h-0 w-28 shrink-0 flex-col gap-3 p-px md:flex">
           <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto *:shrink-0">
             <Card size="sm">
               <CardContent className="flex flex-col gap-3">
@@ -312,6 +380,7 @@ export default function PlayScreen({
           {sidebarFooter}
         </div>
       </div>
+      {sidebarFooter && <div className="shrink-0 md:hidden">{sidebarFooter}</div>}
     </main>
   );
 }

@@ -22,7 +22,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }) {
       <div className="home-scene relative isolate mx-auto overflow-hidden">
         {started ? (
           <div className="absolute inset-0 flex flex-col items-center overflow-y-auto bg-espresso/25 px-4 py-6">
-            <Card className="cafe-panel my-auto w-full max-w-xs shrink-0">
+            <Card className="cafe-panel my-auto w-full shrink-0 md:max-w-xs">
               <CardContent className="flex flex-col gap-4">
                 <Button variant="ghost" className="h-11 self-start" onClick={() => setStarted(false)}>
                   <ArrowLeft aria-hidden="true" />
@@ -76,18 +76,20 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom, error }) {
             <div className="absolute inset-x-4 top-4 flex justify-end">
               <ThemeModeControl />
             </div>
-            <h1 className="home-logo absolute left-1/2 -translate-x-1/2">
-              <img src="/assets/home/cafe-oishi-logo.png" alt={STRINGS.HOME_TITLE} width={920} height={250} className="h-auto w-full [image-rendering:pixelated]" />
-            </h1>
-            <Button
-              variant="ghost"
-              aria-label={STRINGS.HOME_START}
-              onClick={() => setStarted(true)}
-              className="home-start group absolute left-1/2 h-auto -translate-x-1/2 rounded-none border-0 p-0 hover:bg-transparent"
-            >
-              <img src="/assets/home/start-default.png" alt="" width={546} height={216} className="h-auto w-full [image-rendering:pixelated] group-hover:hidden group-focus-visible:hidden group-active:hidden" />
-              <img src="/assets/home/start-active.png" alt="" width={546} height={216} className="hidden h-auto w-full [image-rendering:pixelated] group-hover:block group-focus-visible:block group-active:block" />
-            </Button>
+            <div className="home-actions absolute inset-x-0 mx-auto flex flex-col items-center">
+              <h1 className="home-logo pb-3">
+                <img src="/assets/home/cafe-oishi-logo.png" alt={STRINGS.HOME_TITLE} width={920} height={250} className="h-auto w-full [image-rendering:pixelated]" />
+              </h1>
+              <Button
+                variant="ghost"
+                aria-label={STRINGS.HOME_START}
+                onClick={() => setStarted(true)}
+                className="home-start group h-auto rounded-none border-0 p-0 hover:bg-transparent"
+              >
+                <img src="/assets/home/start-default.png" alt="" width={546} height={216} className="h-auto w-full [image-rendering:pixelated] group-hover:hidden group-focus-visible:hidden group-active:hidden" />
+                <img src="/assets/home/start-active.png" alt="" width={546} height={216} className="hidden h-auto w-full [image-rendering:pixelated] group-hover:block group-focus-visible:block group-active:block" />
+              </Button>
+            </div>
           </>
         )}
       </div>
