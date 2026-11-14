@@ -149,7 +149,10 @@ export default function PlayScreen({
   const showObstacle = !isGameOver && !isTimeUp && (showEventDrop || notice);
 
   return (
-    <main className="relative isolate mx-auto flex h-svh w-full min-w-0 flex-col gap-2 p-2 md:h-180 md:max-h-svh md:max-w-sm md:gap-3 md:p-4">
+    <main
+      className="relative isolate mx-auto flex h-svh w-full min-w-0 select-none flex-col gap-2 p-2 [-webkit-touch-callout:none] md:h-180 md:max-h-svh md:max-w-sm md:gap-3 md:p-4"
+      onContextMenu={(event) => event.preventDefault()}
+    >
       {/* 화면 전체에 까는 카페 배경 */}
       <picture className="pointer-events-none fixed inset-0 -z-10">
         <source media={PLAY_BACKGROUNDS.desktop.media} srcSet={PLAY_BACKGROUNDS.desktop.url} />
@@ -227,7 +230,7 @@ export default function PlayScreen({
         onClose={() => setIsHelpOpen(false)}
         title={STRINGS.PLAY_MERGE_SCORES}
         description={STRINGS.PLAY_MERGE_HELP_DESCRIPTION}
-        contentClassName="max-h-svh overflow-y-auto"
+        contentClassName="max-h-svh select-none overflow-y-auto [-webkit-touch-callout:none]"
       >
         <MergeScoreTable showTitle={false} />
       </Modal>
