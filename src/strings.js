@@ -34,6 +34,31 @@ export const STRINGS = {
   PLAY_TIME_LEFT: '남은 시간',
   PLAY_GAME_OVER: '게임오버',
   PLAY_SPECTATING: '관전 중...',
+  PLAY_SPECTATING_HINT: '남은 시간 동안 점수판을 지켜보세요',
+  PLAY_MY_SCORE: '내 점수',
+  PLAY_FINAL_SCORE: '최종 점수',
+  PLAY_NEXT_DRINK: '다음 음료',
+  PLAY_SCOREBOARD: '점수판',
+  PLAY_DANGER_LINE: '경고선',
+  PLAY_COFFEE_RISK: '커피 위기',
+  PLAY_ME: '나',
+  PLAY_TAP_HINT: '탭해서 음료를 떨어뜨리세요',
+  // 공격 알림 문구 만들기
+  PLAY_ATTACK_NOTICE: (nickname, count) => `${nickname}님이 장애물 ${count}개를 보냈어요`,
+
+  PLAY_MERGE_SCORES: '합체 점수',
+  PLAY_NO_SCORE: '—',
+  // 합체 점수 문구 만들기
+  PLAY_SCORE_PLUS: (score) => `+${score}`,
+  // 콤보 표시 문구 만들기
+  PLAY_COMBO: (count) => `${count}콤보!`,
+  // 공격을 보냈을 때 문구 만들기
+  PLAY_ATTACK_SENT: (count) => `장애물 ${count}개 보냄!`,
+
+  // 플레이 화면 테스트 페이지 (?test=play)
+  DEV_ATTACK: '공격 받기',
+  DEV_GAME_OVER: '게임오버',
+  DEV_RESTART: '다시 시작',
 
   // 결과
   RESULT_TITLE: '결과',
