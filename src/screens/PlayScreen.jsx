@@ -1,5 +1,6 @@
 import { Timer } from 'lucide-react';
 import { Badge } from '#components/ui/badge.jsx';
+import { Button } from '#components/ui/button.jsx';
 import { Card, CardContent } from '#components/ui/card.jsx';
 import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
@@ -96,6 +97,7 @@ export default function PlayScreen({
   myNickname,
   myScore,
   isGameOver,
+  isTimeUp = false,
   countdown = null,
   nextLevel = 1,
   notice = null,
@@ -106,6 +108,7 @@ export default function PlayScreen({
   onComboChange,
   onCombo,
   onGameOver,
+  onShowResult,
 }) {
   const scores = players.map((p) => p.score ?? 0);
   const maxScore = Math.max(...scores, 1);
@@ -183,7 +186,7 @@ export default function PlayScreen({
 
           {!isGameOver && (
             <GameCanvas
-              active={!isCounting}
+              active={!isCounting && !isTimeUp}
               attack={notice}
               onScore={onScore}
               onNext={onNextLevel}
@@ -193,7 +196,7 @@ export default function PlayScreen({
             />
           )}
 
-          {!isGameOver && !isCounting && myScore === 0 && (
+          {!isGameOver && !isCounting && !isTimeUp && myScore === 0 && (
             <p className="pointer-events-none absolute inset-x-0 top-20 px-2 text-center text-sm text-muted-foreground">
               {STRINGS.PLAY_TAP_HINT}
             </p>
@@ -215,7 +218,7 @@ export default function PlayScreen({
           )}
 
           {/* 3-2-1 카운트다운 */}
-          {isCounting && !isGameOver && (
+          {isCounting && !isGameOver && !isTimeUp && (
             <CupOverlay>
               <span key={countdown} className="animate-in font-mono text-8xl font-bold text-primary zoom-in-50 fade-in">
                 {countdown > 0 ? countdown : STRINGS.PLAY_COUNTDOWN_GO}
@@ -223,8 +226,25 @@ export default function PlayScreen({
             </CupOverlay>
           )}
 
+          {/* 시간종료: 최종 점수를 보여주고 리더보드로 넘어간다 */}
+          {isTimeUp && (
+            <CupOverlay>
+              <span className="animate-in text-4xl font-bold text-primary zoom-in-50 fade-in">
+                {STRINGS.PLAY_TIME_UP}
+              </span>
+              <span className="text-sm text-muted-foreground">{STRINGS.PLAY_FINAL_SCORE}</span>
+              <span className="font-mono text-5xl font-bold tabular-nums">{myScore}</span>
+              {onShowResult && (
+                <>
+                  <Button onClick={onShowResult}>{STRINGS.PLAY_SHOW_RESULT}</Button>
+                  <span className="text-sm text-muted-foreground">{STRINGS.PLAY_TIME_UP_HINT}</span>
+                </>
+              )}
+            </CupOverlay>
+          )}
+
           {/* 게임오버: 점수 확정 후 관전 */}
-          {isGameOver && (
+          {isGameOver && !isTimeUp && (
             <CupOverlay>
               <span className="text-3xl font-bold text-destructive">{STRINGS.PLAY_GAME_OVER}</span>
               <span className="text-sm text-muted-foreground">{STRINGS.PLAY_FINAL_SCORE}</span>

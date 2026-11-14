@@ -4,7 +4,7 @@
 
 import Matter from 'matter-js';
 import { COMBO, DRINKS, GAME, OBSTACLE, UNICORN_BONUS } from '#game/constants.js';
-import { DRINK_SPRITES } from '#game/sprites.js';
+import { DRINK_SPRITES, OBSTACLE_SPRITE } from '#game/sprites.js';
 
 const { Bodies, Composite, Engine, Events, Vertices } = Matter;
 
@@ -114,6 +114,14 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     image.src = sprite.url;
   }
 
+  // 장애물 그림 (다 불러오기 전에는 색 사각형으로 그린다)
+  let obstacleImage = null;
+  const obstacleLoader = new Image();
+  obstacleLoader.onload = () => {
+    obstacleImage = obstacleLoader;
+  };
+  obstacleLoader.src = OBSTACLE_SPRITE;
+
   // 그림 1px이 화면에서 몇 px인지 구한다 (그림의 긴 변을 음료 지름에 맞춘다)
   function getSpriteScale(level) {
     const [left, top, right, bottom] = DRINK_SPRITES[level].bounds;
@@ -165,12 +173,12 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     return Math.min(Math.max(x, radius), Math.max(radius, width - radius));
   }
 
-  // 음료 하나를 물리 세계에 넣는다
-  function addDrink(level, x, y) {
+  // 음료 하나를 물리 세계에 넣는다 (mergedAt: 합체로 생긴 음료면 생긴 시각, 떨어뜨린 음료면 null)
+  function addDrink(level, x, y, mergedAt = null) {
     const options = {
       restitution: GAME.RESTITUTION,
       friction: GAME.FRICTION,
-      plugin: { level, merged: false, dangerSince: null },
+      plugin: { level, merged: false, dangerSince: null, mergedAt },
     };
     // 그림 외곽선이 준비됐으면 그 모양으로, 아니면 원으로 충돌체를 만든다
     const outline = outlines[level];
@@ -223,12 +231,19 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     obstacles = obstacles.filter((body) => !near.includes(body));
   }
 
+  // 합체로 막 생긴 음료인지 확인한다 (잠깐은 다시 합쳐지지 않는다)
+  function isMergeLocked(plugin) {
+    return plugin.mergedAt !== null && elapsedMs - plugin.mergedAt < GAME.MERGE_LOCK_MS;
+  }
+
   // 닿은 두 물체가 같은 단계 음료면 합칠 목록에 올린다
   function queueMerges(event) {
     for (const { bodyA, bodyB } of event.pairs) {
       const a = bodyA.plugin;
       const b = bodyB.plugin;
       if (a.level === undefined || a.level !== b.level || a.merged || b.merged) continue;
+      // 막 생긴 음료는 화면에 보일 시간을 준 뒤에 합친다 (계속 닿아 있으면 잠시 뒤 합쳐진다)
+      if (isMergeLocked(a) || isMergeLocked(b)) continue;
       a.merged = true;
       b.merged = true;
       mergeQueue.push([bodyA, bodyB]);
@@ -252,7 +267,7 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
         // 최종 단계끼리 만나면 둘 다 사라지고 보너스 점수
         score += UNICORN_BONUS;
       } else {
-        addDrink(level + 1, clampX(x, getRadius(level + 1)), y);
+        addDrink(level + 1, clampX(x, getRadius(level + 1)), y, elapsedMs);
         score += getDrink(level + 1).mergeScore;
       }
     }
@@ -299,29 +314,31 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
 
   // 음료 하나를 픽셀 그림으로 그린다 (그림이 없으면 원과 글자)
   // 충돌체의 중심(외곽선 무게중심)에 그림의 같은 지점이 오도록 맞춰 그린다
-  function drawDrink(level, x, y, angle = 0, alpha = 1) {
+  function drawDrink(level, x, y, angle = 0, alpha = 1, size = 1) {
     const drink = getDrink(level);
     const radius = getRadius(level);
     const image = images[level];
     const outline = outlines[level];
     ctx.globalAlpha = alpha;
     if (image && outline) {
-      const { size } = DRINK_SPRITES[level];
+      // 인자 size(합체 팝 배율)와 이름이 겹치지 않게 그림 한 변은 spriteSize 로 받는다
+      const { size: spriteSize } = DRINK_SPRITES[level];
       const scale = getSpriteScale(level);
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(angle);
+      ctx.scale(size, size);
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(image, -outline.centre.x * scale, -outline.centre.y * scale, size * scale, size * scale);
+      ctx.drawImage(image, -outline.centre.x * scale, -outline.centre.y * scale, spriteSize * scale, spriteSize * scale);
       ctx.restore();
       ctx.globalAlpha = 1;
       return;
     }
     ctx.fillStyle = colors[drink.color];
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.arc(x, y, radius * size, 0, Math.PI * 2);
     ctx.fill();
-    if (level >= GAME.LABEL_MIN_LEVEL) {
+    if (level >= GAME.LABEL_MIN_LEVEL && size === 1) {
       ctx.fillStyle = textColor;
       ctx.font = `${GAME.LABEL_FONT_PX}px ${styles.fontFamily}`;
       ctx.textAlign = 'center';
@@ -336,6 +353,12 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     ctx.save();
     ctx.translate(body.position.x, body.position.y);
     ctx.rotate(body.angle);
+    if (obstacleImage) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(obstacleImage, -obstacleWidth / 2, -obstacleHeight / 2, obstacleWidth, obstacleHeight);
+      ctx.restore();
+      return;
+    }
     ctx.fillStyle = obstacleColor;
     ctx.beginPath();
     ctx.roundRect(-obstacleWidth / 2, -obstacleHeight / 2, obstacleWidth, obstacleHeight, OBSTACLE.CORNER_RADIUS);
@@ -351,6 +374,13 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     }
     ctx.stroke();
     ctx.restore();
+  }
+
+  // 합체로 생긴 음료를 그릴 크기 비율을 구한다 (작게 시작해 제 크기로 커진다)
+  function getPopScale(plugin) {
+    if (plugin.mergedAt === null) return 1;
+    const progress = Math.min((elapsedMs - plugin.mergedAt) / GAME.MERGE_POP_MS, 1);
+    return GAME.MERGE_POP_START_SCALE + (1 - GAME.MERGE_POP_START_SCALE) * progress;
   }
 
   // 한 프레임을 그린다: 조준선, 손에 든 음료, 컵 안 음료
@@ -371,7 +401,7 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     drawDrink(heldLevel, x, y, 0, canDrop() ? 1 : 0.4);
 
     for (const body of drinks) {
-      drawDrink(body.plugin.level, body.position.x, body.position.y, body.angle);
+      drawDrink(body.plugin.level, body.position.x, body.position.y, body.angle, 1, getPopScale(body.plugin));
       if (GAME.DEBUG_SHOW_OUTLINE) {
         // 확인용: 실제 충돌 외곽선을 선으로 그린다
         ctx.strokeStyle = token('destructive');

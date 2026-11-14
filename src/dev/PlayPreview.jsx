@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '#components/ui/button.jsx';
 import PlayScreen from '#screens/PlayScreen.jsx';
+import ResultScreen from '#screens/ResultScreen.jsx';
 import { ROOM } from '#game/constants.js';
 import { getAttackCount } from '#game/engine.js';
 import { STRINGS } from '#strings.js';
@@ -98,6 +99,17 @@ export default function PlayPreview() {
   const players = [{ nickname: MY_NICKNAME, score: myScore, alive: !isGameOver }, ...others];
   const canPlay = !isCounting && !isGameOver && !isFinished;
 
+  // 제한 시간이 끝나면 게임을 멈추고 결과 화면으로 넘어간다 (다시하기를 누르면 처음부터)
+  if (isFinished) {
+    const today = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const result = {
+      date: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
+      players: players.map((p) => ({ name: p.nickname, score: p.score, finished: true })),
+    };
+    return <ResultScreen result={result} onGoHome={handleRestart} />;
+  }
+
   return (
     <div className="relative mx-auto max-w-sm">
       <PlayScreen
@@ -108,6 +120,7 @@ export default function PlayPreview() {
         myNickname={MY_NICKNAME}
         myScore={myScore}
         isGameOver={isGameOver}
+        isTimeUp={isFinished}
         countdown={countdown}
         nextLevel={nextLevel}
         notice={notice}
