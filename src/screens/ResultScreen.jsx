@@ -1,45 +1,91 @@
+import { ChevronLeft, Coffee, Share } from 'lucide-react';
 import { Button } from '#components/ui/button.jsx';
-import { Card, CardContent } from '#components/ui/card.jsx';
 import { STRINGS } from '#strings.js';
+import { MOCK_RESULT, formatScore, toResultView } from '#screens/resultModel.js';
 
-// 결과 화면: 순위표 + 커피 담당
-export default function ResultScreen({ rankings, coffeeLoser, onPlayAgain, onGoHome }) {
+// 결과 화면: 꼴찌(커피 당번)를 먼저 보여주고, 그 아래 전체 순위를 둔다.
+export default function ResultScreen({ result = MOCK_RESULT, onBack, onGoHome, onShare }) {
+  const view = toResultView(result);
+  const dateLabel = STRINGS.RESULT_DATE(view.month, view.day, view.participantCount);
+  const loserScoreLabel = view.loser ? `${formatScore(view.loser.score)}${STRINGS.RESULT_SCORE_UNIT}` : '';
+  const handleBack = onBack ?? onGoHome;
+
+  async function handleShare() {
+    const text = view.loser
+      ? STRINGS.RESULT_SHARE_TEXT(view.loser.name, loserScoreLabel, dateLabel)
+      : dateLabel;
+    if (onShare) {
+      onShare(text);
+      return;
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: STRINGS.RESULT_COFFEE_DUTY, text });
+      } catch {
+        // 사용자가 공유를 닫은 경우는 그대로 둔다.
+      }
+      return;
+    }
+    await navigator.clipboard.writeText(text);
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh gap-6 p-6">
-      <h2 className="text-2xl font-semibold">{STRINGS.RESULT_TITLE}</h2>
+    <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 bg-background px-4 py-4">
+      <header className="grid grid-cols-[2rem_1fr_2rem] items-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={STRINGS.RESULT_BACK}
+          onClick={handleBack}
+        >
+          <ChevronLeft />
+        </Button>
+        <p className="text-center text-sm text-muted-foreground">{dateLabel}</p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={STRINGS.RESULT_SHARE}
+          onClick={handleShare}
+        >
+          <Share />
+        </Button>
+      </header>
 
-      {/* 커피 담당 */}
-      <Card className="w-full max-w-xs border-destructive">
-        <CardContent className="flex flex-col items-center gap-2 pt-6">
-          <span className="text-sm text-muted-foreground">{STRINGS.RESULT_COFFEE_DUTY}</span>
-          <span className="text-3xl font-bold">{coffeeLoser}</span>
-        </CardContent>
-      </Card>
-
-      {/* 순위표 */}
-      <div className="flex flex-col gap-2 w-full max-w-xs">
-        {rankings.map((r, i) => (
-          <div
-            key={i}
-            className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
-              r.nickname === coffeeLoser ? 'border-destructive bg-destructive/10' : 'border-border bg-card'
-            }`}
-          >
-            <span className="font-mono font-bold">{r.rank}</span>
-            <span>{r.nickname}</span>
-            <span className="font-mono">{r.score}</span>
+      {view.loser && (
+        <section className="flex flex-col items-center gap-3 rounded-2xl bg-destructive/15 px-4 py-6 text-center text-destructive">
+          <p className="text-sm">{STRINGS.RESULT_COFFEE_DUTY}</p>
+          <div className="flex size-16 items-center justify-center rounded-full bg-destructive/20">
+            <Coffee className="size-7" />
           </div>
-        ))}
-      </div>
+          <div>
+            <p className="text-3xl font-bold tracking-tight">{view.loser.name}</p>
+            <p className="mt-1 text-base font-medium">{STRINGS.RESULT_TREATS(view.treatCount)}</p>
+            <p className="mt-1 text-sm">{loserScoreLabel}</p>
+          </div>
+        </section>
+      )}
 
-      <div className="flex gap-3 w-full max-w-xs">
-        <Button variant="secondary" className="flex-1" onClick={onGoHome}>
-          {STRINGS.RESULT_GO_HOME}
-        </Button>
-        <Button className="flex-1" onClick={onPlayAgain}>
-          {STRINGS.RESULT_PLAY_AGAIN}
-        </Button>
-      </div>
+      <section className="flex flex-col gap-1">
+        <h2 className="px-1 text-sm font-medium text-foreground">{STRINGS.RESULT_RANKING}</h2>
+        <ol>
+          {view.rows.map((row) => (
+            <li
+              key={row.name}
+              className={
+                row.isLoser
+                  ? 'mt-1 flex items-center gap-3 rounded-lg bg-destructive/15 px-3 py-2.5 text-destructive'
+                  : 'flex items-center gap-3 border-b border-border px-3 py-2.5 text-foreground'
+              }
+            >
+              <span className="w-4 text-sm tabular-nums">{row.rank}</span>
+              <span className="flex-1 text-sm">{row.name}</span>
+              <span className="text-sm tabular-nums">{formatScore(row.score)}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 }
