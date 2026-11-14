@@ -12,6 +12,7 @@
 
     /* shadcn 시스템 색상 → CSS 변수 연결 */
     --color-background: var(--background);
+    --color-home-backdrop: var(--home-backdrop);
     --color-foreground: var(--foreground);
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
@@ -59,6 +60,8 @@
 :root {
     color-scheme: light;
     --cafe-background-opacity: 1;
+    /* Figma 64:3400의 낮 하늘: 넓은 화면의 메인 바깥 면에도 사용 */
+    --home-backdrop: #5DB6E8;
     /* 커피 테마 기본 색상 */
     --background: oklch(0.98 0.005 70);
     --foreground: oklch(0.2 0.04 50);
@@ -100,6 +103,7 @@
 .dark {
     color-scheme: dark;
     --cafe-background-opacity: 0.24;
+    --home-backdrop: #1B1934;
     /* Figma 44:3525의 밤하늘·로고·START 에셋에서 가져온 색 */
     --background: #1B1934;
     --foreground: #FFFCD6;

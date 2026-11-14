@@ -13,7 +13,7 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom }) {
   const [roomCode, setRoomCode] = useState('');
 
   return (
-    <main className="min-h-svh bg-background">
+    <main className="min-h-svh bg-home-backdrop">
       <div className="home-scene relative isolate mx-auto overflow-hidden">
         <img
           src="/assets/home/cafe-night.png"
@@ -24,11 +24,11 @@ export default function HomeScreen({ onCreateRoom, onJoinRoom }) {
           className="absolute inset-0 hidden size-full object-cover object-bottom [image-rendering:pixelated] dark:block"
         />
         <img
-          src="/assets/backgrounds/cafe-mobile.png"
+          src="/assets/home/cafe-day.png"
           alt=""
           aria-hidden="true"
-          width={390}
-          height={844}
+          width={1080}
+          height={2340}
           className="absolute inset-0 size-full object-cover object-bottom [image-rendering:pixelated] dark:hidden"
         />
 
