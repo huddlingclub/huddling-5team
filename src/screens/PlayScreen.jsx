@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Timer } from 'lucide-react';
 import { Badge } from '#components/ui/badge.jsx';
 import { Button } from '#components/ui/button.jsx';
@@ -6,7 +7,7 @@ import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
 import { COMBO, DRINKS, GAME, ROOM, UNICORN_BONUS } from '#game/constants.js';
-import { DRINK_SPRITES, PLAY_BACKGROUNDS } from '#game/sprites.js';
+import { DRINK_SPRITES, PLAY_BACKGROUNDS, THIEF_SPRITES } from '#game/sprites.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
 
@@ -77,6 +78,35 @@ function MergeScoreTable() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// 장애물이 날아올 때 게임판 오른쪽 위에 잠깐 나오는 작은 도둑 (준비 자세 → 던지는 자세)
+function ThiefThrow() {
+  const [isThrowing, setIsThrowing] = useState(false);
+
+  // 잠깐 준비 자세로 있다가 던지는 자세로 바꾼다
+  useEffect(() => {
+    const id = setTimeout(() => setIsThrowing(true), GAME.THIEF_WINDUP_MS);
+    return () => clearTimeout(id);
+  }, []);
+
+  return (
+    <div className="pointer-events-none absolute top-10 right-1 z-20 animate-in fade-in slide-in-from-right-4">
+      {/* 두 그림을 미리 올려 두고 하나만 보여준다 (바뀔 때 깜빡임 방지). 판 안쪽을 보도록 좌우를 뒤집는다 */}
+      <img
+        src={THIEF_SPRITES.windup}
+        alt=""
+        aria-hidden="true"
+        className={cn('size-10 -scale-x-100 [image-rendering:pixelated]', isThrowing && 'hidden')}
+      />
+      <img
+        src={THIEF_SPRITES.throw}
+        alt=""
+        aria-hidden="true"
+        className={cn('size-10 -scale-x-100 [image-rendering:pixelated]', !isThrowing && 'hidden')}
+      />
+    </div>
   );
 }
 
@@ -183,6 +213,9 @@ export default function PlayScreen({
               </Badge>
             </div>
           )}
+
+          {/* 장애물을 던지는 도둑 */}
+          {notice && !isGameOver && !isTimeUp && <ThiefThrow />}
 
           {!isGameOver && (
             <GameCanvas
