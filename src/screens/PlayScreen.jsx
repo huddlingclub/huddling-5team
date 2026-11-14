@@ -125,7 +125,7 @@ export default function PlayScreen({
           src={PLAY_BACKGROUNDS.mobile}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 -z-10 size-full object-cover object-bottom [image-rendering:pixelated]"
+          className="cafe-background pointer-events-none fixed inset-0 -z-10 size-full object-cover object-bottom [image-rendering:pixelated]"
         />
       </picture>
 

@@ -57,6 +57,8 @@
 
 /* ── 라이트 모드 ── */
 :root {
+    color-scheme: light;
+    --cafe-background-opacity: 1;
     /* 커피 테마 기본 색상 */
     --background: oklch(0.98 0.005 70);
     --foreground: oklch(0.2 0.04 50);
@@ -96,24 +98,27 @@
 
 /* ── 다크 모드 ── */
 .dark {
-    --background: oklch(0.18 0.02 50);
-    --foreground: oklch(0.93 0.01 70);
-    --card: oklch(0.22 0.025 50);
-    --card-foreground: oklch(0.93 0.01 70);
-    --popover: oklch(0.22 0.025 50);
-    --popover-foreground: oklch(0.93 0.01 70);
-    --primary: oklch(0.7 0.1 60);
-    --primary-foreground: oklch(0.18 0.02 50);
-    --secondary: oklch(0.28 0.03 50);
-    --secondary-foreground: oklch(0.9 0.01 70);
-    --muted: oklch(0.28 0.03 50);
-    --muted-foreground: oklch(0.65 0.03 60);
-    --accent: oklch(0.28 0.03 50);
-    --accent-foreground: oklch(0.9 0.01 70);
+    color-scheme: dark;
+    --cafe-background-opacity: 0.24;
+    /* Figma 44:3525의 밤하늘·로고·START 에셋에서 가져온 색 */
+    --background: #1B1934;
+    --foreground: #FFFCD6;
+    --card: #24204A;
+    --card-foreground: #FFFCD6;
+    --popover: #24204A;
+    --popover-foreground: #FFFCD6;
+    --primary: #F45F88;
+    --primary-foreground: #1B1934;
+    --secondary: #33285C;
+    --secondary-foreground: #FFFCD6;
+    --muted: #33285C;
+    --muted-foreground: #CFC7FF;
+    --accent: #4B3166;
+    --accent-foreground: #FFFCD6;
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.7 0.1 60);
+    --ring: #FFDF96;
 
     --bean: oklch(0.55 0.12 55);
     --espresso: oklch(0.45 0.1 40);
@@ -133,8 +138,30 @@
 @utility board-frame {
     border-style: solid;
     border-width: 12px 12px 24px;
-    border-image: url('/assets/ui/board-frame.png') 12 24 24 fill / 12px 24px 24px stretch;
+    border-image: url('/assets/ui/board-frame.png') 12 24 24 / 12px 24px 24px stretch;
+    background-color: var(--background);
     image-rendering: pixelated;
+}
+
+@utility cafe-background {
+    opacity: var(--cafe-background-opacity);
+}
+
+/* 1080×2340 원본의 비율과 로고·START 위치를 유지하는 세로 메인 화면 */
+@utility home-scene {
+    width: min(100%, calc(100svh * 6 / 13));
+    height: 100svh;
+    min-height: 36rem;
+}
+
+@utility home-logo {
+    top: 25.6%;
+    width: 85.2%;
+}
+
+@utility home-start {
+    top: 41.3%;
+    width: 50.56%;
 }
 
 @layer base {
