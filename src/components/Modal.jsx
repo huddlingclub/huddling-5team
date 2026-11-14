@@ -7,13 +7,13 @@ import {
 } from '#components/ui/dialog.jsx';
 
 // 공용 모달 래퍼
-export default function Modal({ open, onClose, title, description, children }) {
+export default function Modal({ open, onClose, title, titleClassName, description, descriptionClassName, contentClassName, children }) {
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose?.()}>
-      <DialogContent>
+      <DialogContent className={contentClassName}>
         <DialogHeader>
-          {title && <DialogTitle>{title}</DialogTitle>}
-          {description && <DialogDescription>{description}</DialogDescription>}
+          {title && <DialogTitle className={titleClassName}>{title}</DialogTitle>}
+          {description && <DialogDescription className={descriptionClassName}>{description}</DialogDescription>}
         </DialogHeader>
         {children}
       </DialogContent>
