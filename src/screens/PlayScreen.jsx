@@ -7,8 +7,8 @@ import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import Modal from '#components/Modal.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
-import { COMBO, DRINKS, GAME, OBSTACLE, ROOM, UNICORN_BONUS } from '#game/constants.js';
-import { DRINK_SPRITES, PLAY_BACKGROUNDS, THIEF_SPRITES } from '#game/sprites.js';
+import { COMBO, DELIVERY, DRINKS, GAME, OBSTACLE, ROOM, UNICORN_BONUS } from '#game/constants.js';
+import { DRINK_SPRITES, PLAY_BACKGROUNDS } from '#game/sprites.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
 
@@ -82,35 +82,6 @@ function MergeScoreTable({ showTitle = true }) {
   );
 }
 
-// 장애물이 날아올 때 게임판 오른쪽 위에 잠깐 나오는 작은 도둑 (준비 자세 → 던지는 자세)
-function ThiefThrow() {
-  const [isThrowing, setIsThrowing] = useState(false);
-
-  // 잠깐 준비 자세로 있다가 던지는 자세로 바꾼다
-  useEffect(() => {
-    const id = setTimeout(() => setIsThrowing(true), GAME.THIEF_WINDUP_MS);
-    return () => clearTimeout(id);
-  }, []);
-
-  return (
-    <div className="pointer-events-none absolute top-10 right-1 z-20 animate-in fade-in slide-in-from-right-4">
-      {/* 두 그림을 미리 올려 두고 하나만 보여준다 (바뀔 때 깜빡임 방지). 판 안쪽을 보도록 좌우를 뒤집는다 */}
-      <img
-        src={THIEF_SPRITES.windup}
-        alt=""
-        aria-hidden="true"
-        className={cn('size-10 -scale-x-100 [image-rendering:pixelated]', isThrowing && 'hidden')}
-      />
-      <img
-        src={THIEF_SPRITES.throw}
-        alt=""
-        aria-hidden="true"
-        className={cn('size-10 -scale-x-100 [image-rendering:pixelated]', !isThrowing && 'hidden')}
-      />
-    </div>
-  );
-}
-
 // 컵 위를 덮는 안내 층 (카운트다운, 게임오버)
 function CupOverlay({ children }) {
   return (
@@ -168,8 +139,10 @@ export default function PlayScreen({
   const isLowTime = timeLeft <= LOW_TIME_SEC;
   const isCounting = countdown !== null;
   const elapsedSec = durationSec - timeLeft;
+  // 15초 경계에서 판이 손을 떠나도록 도둑의 등장 동작만 미리 시작한다.
+  const leadSec = (DELIVERY.ENTER_MS + DELIVERY.LOWER_MS) / 1000;
   const scheduledDrops = eventRound
-    ? Math.min(OBSTACLE.EVENT_DROP_COUNT, Math.floor(elapsedSec / OBSTACLE.EVENT_DROP_INTERVAL_SEC))
+    ? Math.min(OBSTACLE.EVENT_DROP_COUNT, Math.floor((elapsedSec + leadSec) / OBSTACLE.EVENT_DROP_INTERVAL_SEC))
     : 0;
   const lastDropSec = scheduledDrops * OBSTACLE.EVENT_DROP_INTERVAL_SEC;
   const showEventDrop = scheduledDrops > 0 && (elapsedSec - lastDropSec) * 1000 < GAME.NOTICE_MS;
@@ -291,9 +264,6 @@ export default function PlayScreen({
             </div>
           )}
 
-          {/* 장애물을 던지는 도둑 */}
-          {showObstacle && <ThiefThrow />}
-
           {!isGameOver && (
             <GameCanvas
               active={!isCounting && !isTimeUp}
@@ -307,7 +277,7 @@ export default function PlayScreen({
             />
           )}
 
-          {!isGameOver && !isCounting && !isTimeUp && myScore === 0 && (
+          {!isGameOver && !isCounting && !isTimeUp && !showObstacle && myScore === 0 && (
             <p className="pointer-events-none absolute inset-x-0 top-20 px-2 text-center text-sm text-muted-foreground">
               {STRINGS.PLAY_TAP_HINT}
             </p>
