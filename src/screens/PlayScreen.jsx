@@ -5,7 +5,7 @@ import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
 import { COMBO, DRINKS, GAME, ROOM, UNICORN_BONUS } from '#game/constants.js';
-import { DRINK_SPRITES } from '#game/sprites.js';
+import { DRINK_SPRITES, PLAY_BACKGROUNDS } from '#game/sprites.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
 
@@ -117,6 +117,18 @@ export default function PlayScreen({
 
   return (
     <div className="mx-auto flex h-svh w-full max-w-sm flex-col gap-3 p-4">
+      {/* 화면 전체에 까는 카페 배경 */}
+      <picture>
+        <source media={PLAY_BACKGROUNDS.desktop.media} srcSet={PLAY_BACKGROUNDS.desktop.url} />
+        <source media={PLAY_BACKGROUNDS.mobileSmall.media} srcSet={PLAY_BACKGROUNDS.mobileSmall.url} />
+        <img
+          src={PLAY_BACKGROUNDS.mobile}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 -z-10 size-full object-cover object-bottom [image-rendering:pixelated]"
+        />
+      </picture>
+
       {/* 상단: 남은 시간 + 내 점수 + 다음 음료 */}
       <Card size="sm">
         <CardContent className="flex flex-col gap-3">
@@ -150,7 +162,7 @@ export default function PlayScreen({
       {/* 아래: 컵(왼쪽) + 점수판(오른쪽) */}
       <div className="flex min-h-0 flex-1 gap-3">
         {/* 컵(게임판) */}
-        <div className="relative h-full min-w-0 flex-1 overflow-hidden rounded-b-3xl border-x-4 border-b-4 border-primary bg-card">
+        <div className="board-frame relative h-full min-w-0 flex-1 overflow-hidden">
           {/* 경고선 */}
           <div
             className="pointer-events-none absolute inset-x-0 z-10 flex -translate-y-1/2 items-center gap-2 px-2"
