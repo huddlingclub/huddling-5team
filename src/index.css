@@ -68,6 +68,8 @@
     --home-art: url('/assets/home/cafe-day.png');
     --result-loser: #ffecd4;
     --result-loser-border: #bd7743;
+    --board-rim-outline: #694331;
+    --board-rim-highlight: #f4dfb8;
     /* 커피 테마 기본 색상 */
     --background: #fbf1dc;
     --foreground: oklch(0.2 0.04 50);
@@ -153,6 +155,12 @@
     border-width: 12px 12px 24px;
     border-image: url('/assets/ui/board-frame.png') 12 24 24 / 12px 24px 24px stretch;
     background-color: var(--background);
+    /* 원본의 투명한 윗변을 양쪽 모서리와 같은 4px 두 줄로 잇는다. */
+    background-image: linear-gradient(var(--board-rim-outline) 0 0), linear-gradient(var(--board-rim-highlight) 0 0);
+    background-origin: border-box;
+    background-position: center 4px, center 8px;
+    background-size: calc(100% - 16px) 4px;
+    background-repeat: no-repeat;
     image-rendering: pixelated;
 }
 
