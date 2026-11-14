@@ -40,12 +40,9 @@ export const STRINGS = {
   RESULT_COFFEE_DUTY: '오늘의 커피 당번',
   RESULT_PLAY_AGAIN: '한 판 더',
   RESULT_GO_HOME: '홈으로',
-  RESULT_BACK: '뒤로',
-  RESULT_SHARE: '공유',
+  RESULT_RETRY: '다시하기',
   RESULT_RANKING: '전체 순위',
   RESULT_SCORE_UNIT: '점',
   RESULT_DATE: (month, day, count) => `${month}월 ${day}일 · ${count}명 참여`,
   RESULT_TREATS: (count) => `${count}명에게 커피를 쏩니다`,
-  RESULT_SHARE_TEXT: (name, scoreLabel, dateLabel) =>
-    `${dateLabel} 오늘의 커피 당번은 ${name} (${scoreLabel})`,
 };

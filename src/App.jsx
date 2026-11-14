@@ -91,7 +91,7 @@ export default function App() {
   }
 
   if (screen === 'result') {
-    return <ResultPage result={result ?? undefined} onBack={leaveResult} />;
+    return <ResultPage result={result ?? undefined} onGoHome={leaveResult} />;
   }
 
   return null;

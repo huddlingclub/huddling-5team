@@ -1,56 +1,18 @@
-import { ChevronLeft, Coffee, Share } from 'lucide-react';
+import { Coffee } from 'lucide-react';
 import { Button } from '#components/ui/button.jsx';
 import { STRINGS } from '#strings.js';
 import { MOCK_RESULT, formatScore, toResultView } from '#screens/resultModel.js';
 
 // 결과 화면: 꼴찌(커피 당번)를 먼저 보여주고, 그 아래 전체 순위를 둔다.
-export default function ResultScreen({ result = MOCK_RESULT, onBack, onGoHome, onShare }) {
+export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   const view = toResultView(result);
   const dateLabel = STRINGS.RESULT_DATE(view.month, view.day, view.participantCount);
   const loserScoreLabel = view.loser ? `${formatScore(view.loser.score)}${STRINGS.RESULT_SCORE_UNIT}` : '';
-  const handleBack = onBack ?? onGoHome;
-
-  async function handleShare() {
-    const text = view.loser
-      ? STRINGS.RESULT_SHARE_TEXT(view.loser.name, loserScoreLabel, dateLabel)
-      : dateLabel;
-    if (onShare) {
-      onShare(text);
-      return;
-    }
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: STRINGS.RESULT_COFFEE_DUTY, text });
-      } catch {
-        // 사용자가 공유를 닫은 경우는 그대로 둔다.
-      }
-      return;
-    }
-    await navigator.clipboard.writeText(text);
-  }
 
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 bg-background px-4 py-4">
-      <header className="grid grid-cols-[2rem_1fr_2rem] items-center">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={STRINGS.RESULT_BACK}
-          onClick={handleBack}
-        >
-          <ChevronLeft />
-        </Button>
+      <header>
         <p className="text-center text-sm text-muted-foreground">{dateLabel}</p>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={STRINGS.RESULT_SHARE}
-          onClick={handleShare}
-        >
-          <Share />
-        </Button>
       </header>
 
       {view.loser && (
@@ -86,6 +48,10 @@ export default function ResultScreen({ result = MOCK_RESULT, onBack, onGoHome, o
           ))}
         </ol>
       </section>
+
+      <Button type="button" size="lg" className="mt-auto w-full" onClick={onGoHome}>
+        {STRINGS.RESULT_RETRY}
+      </Button>
     </div>
   );
 }
