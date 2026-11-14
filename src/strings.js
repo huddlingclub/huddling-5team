@@ -62,13 +62,20 @@ export const STRINGS = {
 
   // 결과
   RESULT_TITLE: '결과',
-  RESULT_COFFEE_DUTY: '오늘의 커피 당번',
-  RESULT_AMERICANO: '아이스 아메리카노',
+  RESULT_COFFEE_DUTY: '오늘의 커피 담당',
+  RESULT_DUTY_BADGE: '커피 담당',
+  RESULT_RANKING: '전체 순위',
+  RESULT_ME: '나',
+  RESULT_SCORE_UNIT: '점',
+  // 날짜와 참여 인원 문구 만들기
+  RESULT_DATE: (month, day, count) => `${month}월 ${day}일 · ${count}명 참여`,
   RESULT_PLAY_AGAIN: '한 판 더',
   RESULT_GO_HOME: '홈으로',
-  RESULT_RETRY: '다시하기',
-  RESULT_RANKING: '전체 순위',
-  RESULT_SCORE_UNIT: '점',
-  RESULT_DATE: (month, day, count) => `${month}월 ${day}일 · ${count}명 참여`,
-  RESULT_TREATS: (count) => `${count}명에게 커피를 쏩니다`,
+
+  // 결과 화면 테스트 페이지 (?test=result)
+  DEV_RESULT_SIX: '6명',
+  DEV_RESULT_TWO: '2명',
+  DEV_RESULT_TIE: '동점·긴 닉네임',
+  DEV_RESULT_PLAY_AGAIN_CLICKED: '"한 판 더"를 눌렀어요',
+  DEV_RESULT_GO_HOME_CLICKED: '"홈으로"를 눌렀어요',
 };
