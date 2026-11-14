@@ -1,4 +1,3 @@
-import { Coffee } from 'lucide-react';
 import { Button } from '#components/ui/button.jsx';
 import { STRINGS } from '#strings.js';
 import { MOCK_RESULT, formatScore, toResultView } from '#screens/resultModel.js';
@@ -7,7 +6,6 @@ import { MOCK_RESULT, formatScore, toResultView } from '#screens/resultModel.js'
 export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
   const view = toResultView(result);
   const dateLabel = STRINGS.RESULT_DATE(view.month, view.day, view.participantCount);
-  const loserScoreLabel = view.loser ? `${formatScore(view.loser.score)}${STRINGS.RESULT_SCORE_UNIT}` : '';
 
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-sm flex-col gap-6 bg-background px-4 py-4">
@@ -16,16 +14,10 @@ export default function ResultScreen({ result = MOCK_RESULT, onGoHome }) {
       </header>
 
       {view.loser && (
-        <section className="flex flex-col items-center gap-3 rounded-2xl bg-destructive/15 px-4 py-6 text-center text-destructive">
-          <p className="text-sm">{STRINGS.RESULT_COFFEE_DUTY}</p>
-          <div className="flex size-16 items-center justify-center rounded-full bg-destructive/20">
-            <Coffee className="size-7" />
-          </div>
-          <div>
-            <p className="text-3xl font-bold tracking-tight">{view.loser.name}</p>
-            <p className="mt-1 text-base font-medium">{STRINGS.RESULT_TREATS(view.treatCount)}</p>
-            <p className="mt-1 text-sm">{loserScoreLabel}</p>
-          </div>
+        <section className="flex flex-col items-center rounded-3xl bg-card px-6 py-8 text-center">
+          <div className="size-36 rounded-full bg-foreground/10" aria-hidden="true" />
+          <p className="mt-6 text-sm text-foreground">{STRINGS.RESULT_COFFEE_DUTY}</p>
+          <p className="mt-2 text-5xl font-bold tracking-tight text-foreground">{view.loser.name}</p>
         </section>
       )}
 
