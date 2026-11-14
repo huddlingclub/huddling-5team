@@ -4,8 +4,9 @@
 
 import Matter from 'matter-js';
 import { COMBO, DRINKS, GAME, OBSTACLE, UNICORN_BONUS } from '#game/constants.js';
+import { DRINK_SPRITES } from '#game/sprites.js';
 
-const { Bodies, Composite, Engine, Events } = Matter;
+const { Bodies, Composite, Engine, Events, Vertices } = Matter;
 
 // 가장 높은 음료 단계 (이 단계끼리 만나면 둘 다 사라진다)
 const MAX_LEVEL = Math.max(...DRINKS.map((d) => d.level));
@@ -37,6 +38,54 @@ export function getAttackCount(combo) {
   return Math.min(combo - 1, COMBO.MAX_OBSTACLES_PER_ATTACK);
 }
 
+// 그림에서 불투명한 부분을 감싸는 볼록한 외곽선을 구한다
+// 돌려주는 값: { centre: 외곽선 무게중심(그림 px), vertices: 무게중심 기준 꼭짓점들(그림 px) }
+function buildOutline(image, size) {
+  const buffer = document.createElement('canvas');
+  buffer.width = size;
+  buffer.height = size;
+  const bufferCtx = buffer.getContext('2d');
+  bufferCtx.drawImage(image, 0, 0, size, size);
+  const { data } = bufferCtx.getImageData(0, 0, size, size);
+
+  // 줄마다 가장 왼쪽·오른쪽 불투명 픽셀의 모서리를 모은다
+  const points = [];
+  for (let y = 0; y < size; y += 1) {
+    let minX = -1;
+    let maxX = -1;
+    for (let x = 0; x < size; x += 1) {
+      if (data[(y * size + x) * 4 + 3] > GAME.OUTLINE_ALPHA_MIN) {
+        if (minX < 0) minX = x;
+        maxX = x;
+      }
+    }
+    if (minX < 0) continue;
+    points.push({ x: minX, y }, { x: maxX + 1, y }, { x: minX, y: y + 1 }, { x: maxX + 1, y: y + 1 });
+  }
+  if (points.length === 0) return null;
+
+  // 볼록 껍질을 구한 뒤, 모양에 가장 덜 기여하는 꼭짓점부터 빼서 개수를 줄인다
+  const hull = Vertices.hull(points);
+  while (hull.length > GAME.OUTLINE_MAX_POINTS) {
+    let weakest = 0;
+    let weakestArea = Infinity;
+    for (let i = 0; i < hull.length; i += 1) {
+      const a = hull[(i + hull.length - 1) % hull.length];
+      const b = hull[i];
+      const c = hull[(i + 1) % hull.length];
+      const area = Math.abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y));
+      if (area < weakestArea) {
+        weakestArea = area;
+        weakest = i;
+      }
+    }
+    hull.splice(weakest, 1);
+  }
+
+  const centre = Vertices.centre(hull);
+  return { centre, vertices: hull.map((p) => ({ x: p.x - centre.x, y: p.y - centre.y })) };
+}
+
 // 게임 한 판을 만든다. 낙하·쌓임·머지·점수까지 구현 (콤보·장애물·게임오버까지 구현
 // onComboChange(count): 콤보 수가 바뀔 때마다, onCombo(count): 2콤보 이상이 끊긴 순간 한 번
 export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, onGameOver }) {
@@ -52,6 +101,24 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
   // 장애물(초콜릿 판) 크기
   const obstacleWidth = getRadius(OBSTACLE.WIDTH_LEVEL) * 2;
   const obstacleHeight = obstacleWidth * OBSTACLE.THICKNESS_RATIO;
+
+  // 단계별 픽셀 그림과 충돌 외곽선 (다 불러오기 전에는 색 원으로 그리고 원으로 부딪힌다)
+  const images = {};
+  const outlines = {};
+  for (const [level, sprite] of Object.entries(DRINK_SPRITES)) {
+    const image = new Image();
+    image.onload = () => {
+      images[level] = image;
+      outlines[level] = buildOutline(image, sprite.size);
+    };
+    image.src = sprite.url;
+  }
+
+  // 그림 1px이 화면에서 몇 px인지 구한다 (그림의 긴 변을 음료 지름에 맞춘다)
+  function getSpriteScale(level) {
+    const [left, top, right, bottom] = DRINK_SPRITES[level].bounds;
+    return (getRadius(level) * 2 * GAME.SPRITE_FIT) / Math.max(right - left, bottom - top);
+  }
 
   let width = 0;
   let height = 0;
@@ -100,12 +167,17 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
 
   // 음료 하나를 물리 세계에 넣는다
   function addDrink(level, x, y) {
-    const radius = getRadius(level);
-    const body = Bodies.circle(x, y, radius, {
+    const options = {
       restitution: GAME.RESTITUTION,
       friction: GAME.FRICTION,
       plugin: { level, merged: false, dangerSince: null },
-    });
+    };
+    // 그림 외곽선이 준비됐으면 그 모양으로, 아니면 원으로 충돌체를 만든다
+    const outline = outlines[level];
+    const scale = getSpriteScale(level);
+    const body = outline
+      ? Bodies.fromVertices(x, y, [outline.vertices.map((p) => ({ x: p.x * scale, y: p.y * scale }))], options)
+      : Bodies.circle(x, y, getRadius(level), options);
     Composite.add(engine.world, body);
     drinks.push(body);
     maxLevel = Math.max(maxLevel, level);
@@ -225,11 +297,26 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     );
   }
 
-  // 음료 하나를 원과 글자로 그린다
-  function drawDrink(level, x, y, alpha = 1) {
+  // 음료 하나를 픽셀 그림으로 그린다 (그림이 없으면 원과 글자)
+  // 충돌체의 중심(외곽선 무게중심)에 그림의 같은 지점이 오도록 맞춰 그린다
+  function drawDrink(level, x, y, angle = 0, alpha = 1) {
     const drink = getDrink(level);
     const radius = getRadius(level);
+    const image = images[level];
+    const outline = outlines[level];
     ctx.globalAlpha = alpha;
+    if (image && outline) {
+      const { size } = DRINK_SPRITES[level];
+      const scale = getSpriteScale(level);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(image, -outline.centre.x * scale, -outline.centre.y * scale, size * scale, size * scale);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+      return;
+    }
     ctx.fillStyle = colors[drink.color];
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -281,10 +368,19 @@ export function createGame({ canvas, onScore, onNext, onComboChange, onCombo, on
     ctx.lineTo(x, height);
     ctx.stroke();
     ctx.setLineDash([]);
-    drawDrink(heldLevel, x, y, canDrop() ? 1 : 0.4);
+    drawDrink(heldLevel, x, y, 0, canDrop() ? 1 : 0.4);
 
     for (const body of drinks) {
-      drawDrink(body.plugin.level, body.position.x, body.position.y);
+      drawDrink(body.plugin.level, body.position.x, body.position.y, body.angle);
+      if (GAME.DEBUG_SHOW_OUTLINE) {
+        // 확인용: 실제 충돌 외곽선을 선으로 그린다
+        ctx.strokeStyle = token('destructive');
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        body.vertices.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+        ctx.closePath();
+        ctx.stroke();
+      }
     }
     for (const body of obstacles) {
       drawObstacle(body);

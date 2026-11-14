@@ -5,21 +5,12 @@ import { Progress } from '#components/ui/progress.jsx';
 import ScoreBar from '#components/ScoreBar.jsx';
 import GameCanvas from '#game/GameCanvas.jsx';
 import { COMBO, DRINKS, GAME, ROOM } from '#game/constants.js';
+import { DRINK_SPRITES } from '#game/sprites.js';
 import { cn } from '#lib/utils.js';
 import { STRINGS } from '#strings.js';
 
 // 남은 시간이 이 값(초) 이하면 타이머를 경고색으로 바꾼다
 const LOW_TIME_SEC = 10;
-
-// 음료 색 토큰 이름 → Tailwind 배경 클래스
-const DRINK_BG = {
-  bean: 'bg-bean',
-  espresso: 'bg-espresso',
-  americano: 'bg-americano',
-  latte: 'bg-latte',
-  frappe: 'bg-frappe',
-  unicorn: 'bg-unicorn',
-};
 
 // 초를 "분:초" 형태로 바꾼다
 function formatTime(sec) {
@@ -37,7 +28,11 @@ function NextDrink({ level }) {
         <span className="text-xs text-muted-foreground">{STRINGS.PLAY_NEXT_DRINK}</span>
         <span className="text-sm font-medium">{drink.name}</span>
       </div>
-      <div className={cn('size-9 shrink-0 rounded-full ring-2 ring-border', DRINK_BG[drink.color])} />
+      <img
+        src={DRINK_SPRITES[drink.level].url}
+        alt={drink.name}
+        className="size-10 shrink-0 [image-rendering:pixelated]"
+      />
     </div>
   );
 }

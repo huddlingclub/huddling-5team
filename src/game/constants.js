@@ -48,7 +48,15 @@ export const GAME = {
   FRICTION: 0.3,
   // 한 프레임에 진행하는 최대 시간 (ms) - 탭을 벗어났다 돌아올 때 튀는 것 방지
   MAX_FRAME_MS: 33,
-  // 이 단계부터 원 안에 음료 이름을 적는다
+  // 그림의 긴 변 = 음료 지름 × 이 비율 (1이면 그림 긴 변이 지름과 같음)
+  SPRITE_FIT: 1,
+  // 이 값보다 불투명한 픽셀만 그림의 몸통으로 본다 (0~255)
+  OUTLINE_ALPHA_MIN: 32,
+  // 충돌 외곽선을 이루는 꼭짓점 최대 개수 (많을수록 정밀하지만 느려짐)
+  OUTLINE_MAX_POINTS: 14,
+  // true면 충돌 외곽선을 화면에 그린다 (확인용)
+  DEBUG_SHOW_OUTLINE: false,
+  // (그림을 못 불러왔을 때) 이 단계부터 원 안에 음료 이름을 적는다
   LABEL_MIN_LEVEL: 3,
   // 음료 이름 글자 크기 (px)
   LABEL_FONT_PX: 12,
